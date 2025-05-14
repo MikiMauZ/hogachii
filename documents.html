@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentos - CasitaFeliz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/kawaii-theme.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+  <header>
+  <nav>
+    <!-- Menú hamburguesa para móviles (ahora a la izquierda) -->
+    <div class="hamburger-menu" id="hamburgerMenu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    
+    <!-- Logo clickable -->
+    <a href="index.html" class="logo">CasitaFeliz</a>
+    
+    <ul class="menu">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="tasks.html">Tareas</a></li>
+      <li><a href="shopping.html">Compras</a></li>
+      <li><a href="calendar.html">Calendario</a></li>
+      <li><a href="documents.html">Documentos</a></li>
+      <li><a href="chat.html">Chat</a></li>
+    </ul>
+    
+    <!-- Versión móvil del menú (más elegante) -->
+    <div class="menu-mobile" id="mobileMenu">
+      <div class="menu-mobile-logo">CasitaFeliz</div>
+      <ul>
+        <li><a href="index.html"><span class="menu-icon">🏠</span> Inicio</a></li>
+        <li><a href="tasks.html"><span class="menu-icon">✅</span> Tareas</a></li>
+        <li><a href="shopping.html"><span class="menu-icon">🛒</span> Compras</a></li>
+        <li><a href="calendar.html"><span class="menu-icon">📅</span> Calendario</a></li>
+        <li><a href="documents.html"><span class="menu-icon">📄</span> Documentos</a></li>
+        <li><a href="chat.html"><span class="menu-icon">💬</span> Chat</a></li>
+      </ul>
+    </div>
+    
+    <div class="user-menu" id="userMenu">
+      <!-- Se rellena con JavaScript -->
+    </div>
+  </nav>
+</header>
+
+  <main>
+    <h1>Documentos Importantes <span class="kawaii-icon">📄</span></h1>
+    
+    <div class="documents-container">
+      <div class="documents-header">
+        <button id="uploadDocBtn" class="kawaii-btn">
+          <span>Subir Documento</span>
+        </button>
+        
+        <div class="documents-filters">
+          <button class="kawaii-filter active" data-category="all">Todos</button>
+          <button class="kawaii-filter" data-category="bills">Facturas</button>
+          <button class="kawaii-filter" data-category="warranty">Garantías</button>
+          <button class="kawaii-filter" data-category="contract">Contratos</button>
+          <button class="kawaii-filter" data-category="manual">Manuales</button>
+          <button class="kawaii-filter" data-category="other">Otros</button>
+        </div>
+      </div>
+      
+      <div class="documents-grid" id="documentsGrid">
+        <!-- Se rellena con JavaScript -->
+        <div class="loader"></div>
+      </div>
+    </div>
+    
+    <!-- Modal para Subir Documento -->
+    <div class="modal-overlay" id="documentModal" style="display: none;">
+      <div class="modal-content">
+        <button class="modal-close" id="closeDocumentModal">&times;</button>
+        <h2 class="modal-title">Subir Documento</h2>
+        
+        <form id="documentForm">
+          <div class="form-group">
+            <label for="documentTitle">Título del Documento</label>
+            <input type="text" id="documentTitle" name="documentTitle" required placeholder="Nombre del documento">
+          </div>
+          
+          <div class="form-group">
+            <label for="documentDescription">Descripción (opcional)</label>
+            <textarea id="documentDescription" name="documentDescription" rows="3" placeholder="Detalles del documento..."></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="documentCategory">Categoría</label>
+            <select id="documentCategory" name="documentCategory">
+              <option value="bills">Facturas</option>
+              <option value="warranty">Garantías</option>
+              <option value="contract">Contratos</option>
+              <option value="manual">Manuales</option>
+              <option value="other">Otros</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="documentFile">Archivo</label>
+            <input type="file" id="documentFile" name="documentFile" required>
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" id="cancelDocumentBtn" class="btn-secondary">Cancelar</button>
+            <button type="submit" class="kawaii-btn">Subir Documento</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Modal para Ver Documento -->
+    <div class="modal-overlay" id="viewDocumentModal" style="display: none;">
+      <div class="modal-content">
+        <button class="modal-close" id="closeViewDocumentModal">&times;</button>
+        <h2 class="modal-title" id="viewDocumentTitle">Detalles del Documento</h2>
+        
+        <div id="documentDetails">
+          <!-- Se rellena con JavaScript -->
+        </div>
+        
+        <div class="modal-actions">
+          <button id="deleteDocumentBtn" class="btn-secondary">Eliminar</button>
+          <button id="downloadDocumentBtn" class="kawaii-btn">Descargar</button>
+          <button id="closeViewDocumentBtn" class="btn-secondary">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>CasitaFeliz &copy; 2025</p>
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+  
+  <script src="js/firebase-config.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/documents.js"></script>
+</body>
+</html>

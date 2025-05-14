@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro - CasitaFeliz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/kawaii-theme.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #fff5f7;
+    }
+    
+    .register-container {
+      max-width: 400px;
+      width: 90%;
+      padding: 30px;
+      background-color: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(255, 107, 157, 0.1);
+      margin: 20px 0;
+    }
+    
+    .register-logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .register-logo h1 {
+      color: #ff6b9d;
+      font-size: 28px;
+      margin-bottom: 5px;
+      justify-content: center;
+    }
+    
+    .register-logo p {
+      color: #999;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #555;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #ffdfec;
+      border-radius: 50px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    
+    .form-group input:focus {
+      border-color: #ff6b9d;
+      outline: none;
+    }
+    
+    .register-btn {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 50px;
+      background-color: #ff6b9d;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-top: 10px;
+    }
+    
+    .register-btn:hover {
+      background-color: #ff4d8a;
+    }
+    
+    .register-footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #999;
+    }
+    
+    .register-footer a {
+      color: #ff6b9d;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <div class="register-logo">
+      <h1>✨ CasitaFeliz ✨</h1>
+      <p>Crea tu cuenta para un hogar feliz</p>
+    </div>
+    
+    <form id="registerForm">
+      <div class="form-group">
+        <label for="displayName">Nombre</label>
+        <input type="text" id="displayName" name="displayName" required placeholder="Tu nombre">
+      </div>
+      
+      <div class="form-group">
+        <label for="email">Correo Electrónico</label>
+        <input type="email" id="email" name="email" required placeholder="tucorreo@ejemplo.com">
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" name="password" required placeholder="Mínimo 6 caracteres">
+      </div>
+      
+      <div class="form-group">
+        <label for="confirmPassword">Confirmar Contraseña</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Repite tu contraseña">
+      </div>
+      
+      <button type="submit" class="register-btn">Crear Cuenta</button>
+    </form>
+    
+    <div class="register-footer">
+      ¿Ya tienes cuenta? <a href="login.html">Inicia sesión aquí</a>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+  
+  <script src="js/firebase-config.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Manejar envío del formulario
+      const registerForm = document.getElementById('registerForm');
+      
+      registerForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const displayName = document.getElementById('displayName').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        
+        // Validación básica
+        if (!displayName || !email || !password || !confirmPassword) {
+          showNotification('Por favor, completa todos los campos', 'error');
+          return;
+        }
+        
+        if (password !== confirmPassword) {
+          showNotification('Las contraseñas no coinciden', 'error');
+          return;
+        }
+        
+        if (password.length < 6) {
+          showNotification('La contraseña debe tener al menos 6 caracteres', 'error');
+          return;
+        }
+        
+        // Registrar usuario
+        registerUser(email, password, displayName);
+      });
+    });
+  </script>
+</body>
+</html>

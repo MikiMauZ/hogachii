@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - CasitaFeliz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/kawaii-theme.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+  <header>
+  <nav>
+    <!-- Menú hamburguesa para móviles (ahora a la izquierda) -->
+    <div class="hamburger-menu" id="hamburgerMenu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    
+    <!-- Logo clickable -->
+    <a href="index.html" class="logo">CasitaFeliz</a>
+    
+    <ul class="menu">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="tasks.html">Tareas</a></li>
+      <li><a href="shopping.html">Compras</a></li>
+      <li><a href="calendar.html">Calendario</a></li>
+      <li><a href="documents.html">Documentos</a></li>
+      <li><a href="chat.html">Chat</a></li>
+    </ul>
+    
+    <!-- Versión móvil del menú (más elegante) -->
+    <div class="menu-mobile" id="mobileMenu">
+      <div class="menu-mobile-logo">CasitaFeliz</div>
+      <ul>
+        <li><a href="index.html"><span class="menu-icon">🏠</span> Inicio</a></li>
+        <li><a href="tasks.html"><span class="menu-icon">✅</span> Tareas</a></li>
+        <li><a href="shopping.html"><span class="menu-icon">🛒</span> Compras</a></li>
+        <li><a href="calendar.html"><span class="menu-icon">📅</span> Calendario</a></li>
+        <li><a href="documents.html"><span class="menu-icon">📄</span> Documentos</a></li>
+        <li><a href="chat.html"><span class="menu-icon">💬</span> Chat</a></li>
+      </ul>
+    </div>
+    
+    <div class="user-menu" id="userMenu">
+      <!-- Se rellena con JavaScript -->
+    </div>
+  </nav>
+</header>
+
+  <main>
+    <h1>¡Bienvenido a tu CasitaFeliz! <span class="kawaii-icon">🏡</span></h1>
+    
+    <div class="dashboard-welcome" id="welcomeMessage">
+      <!-- Se rellena con JavaScript -->
+    </div>
+    
+    <div class="dashboard-grid">
+      <div class="card">
+        <div class="card-title">
+          <span class="kawaii-icon">✅</span> Tareas Pendientes
+        </div>
+        <div class="card-content" id="pendingTasksCard">
+          <div class="loader"></div>
+        </div>
+        <a href="tasks.html" class="kawaii-btn mt-20">Ver todas las tareas</a>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">
+          <span class="kawaii-icon">🛒</span> Lista de Compra
+        </div>
+        <div class="card-content" id="shoppingListCard">
+          <div class="loader"></div>
+        </div>
+        <a href="shopping.html" class="kawaii-btn mt-20">Ver lista completa</a>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">
+          <span class="kawaii-icon">📅</span> Próximos Eventos
+        </div>
+        <div class="card-content" id="upcomingEventsCard">
+          <div class="loader"></div>
+        </div>
+        <a href="calendar.html" class="kawaii-btn mt-20">Ver calendario</a>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">
+          <span class="kawaii-icon">📋</span> Actividad Reciente
+        </div>
+        <div class="card-content" id="recentActivityCard">
+          <div class="loader"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>CasitaFeliz &copy; 2025</p>
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+  
+  <script src="js/firebase-config.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Verificar autenticación
+      checkAuth().then(user => {
+        // Actualizar mensaje de bienvenida
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        const displayName = user.displayName || 'Usuario';
+        
+        const greetings = ['¡Hola', '¡Bienvenido', '¡Qué alegría verte', '¡Un placer tenerte aquí'];
+        const greeting = greetings[Math.floor(Math.random() * greetings.length)];
+        
+        welcomeMessage.innerHTML = `
+          <h2>${greeting}, ${displayName}! <span class="kawaii-icon">😊</span></h2>
+          <p>¿Qué te gustaría gestionar hoy en tu hogar?</p>
+        `;
+        
+        // Cargar datos de la dashboard
+        loadPendingTasks();
+        loadShoppingList();
+        loadUpcomingEvents();
+        loadRecentActivity();
+      }).catch(error => {
+        console.error("Error de autenticación:", error);
+      });
+      
+      // Cargar tareas pendientes
+      function loadPendingTasks() {
+        const pendingTasksCard = document.getElementById('pendingTasksCard');
+        const homeId = getCurrentHome();
+        
+        if (!homeId) {
+          pendingTasksCard.innerHTML = '<p class="empty-message">No hay un hogar seleccionado</p>';
+          return;
+        }
+        
+        db.collection('tasks')
+          .where('homeId', '==', homeId)
+          .where('status', '==', 'pending')
+          .orderBy('dueDate', 'asc')
+          .limit(3)
+          .get()
+          .then((snapshot) => {
+            if (snapshot.empty) {
+              pendingTasksCard.innerHTML = '<p class="empty-message">No hay tareas pendientes. ¡Todo en orden!</p>';
+              return;
+            }
+            
+            let tasksHTML = '<ul class="dashboard-list">';
+            
+            snapshot.forEach((doc) => {
+              const task = doc.data();
+              const dueDate = task.dueDate ? new Date(task.dueDate.seconds * 1000) : null;
+              const dueDateStr = dueDate ? dueDate.toLocaleDateString() : 'Sin fecha';
+              
+              tasksHTML += `
+                <li class="dashboard-item">
+                  <div class="dashboard-item-title">${task.title}</div>
+                  <div class="dashboard-item-meta">Fecha límite: ${dueDateStr}</div>
+                </li>
+              `;
+            });
+            
+            tasksHTML += '</ul>';
+            pendingTasksCard.innerHTML = tasksHTML;
+          })
+          .catch((error) => {
+            console.error("Error al cargar tareas:", error);
+            pendingTasksCard.innerHTML = '<p class="error-message">Error al cargar tareas</p>';
+          });
+      }
+      
+      // Cargar lista de compra
+      function loadShoppingList() {
+        const shoppingListCard = document.getElementById('shoppingListCard');
+        const homeId = getCurrentHome();
+        
+        if (!homeId) {
+          shoppingListCard.innerHTML = '<p class="empty-message">No hay un hogar seleccionado</p>';
+          return;
+        }
+        
+        db.collection('shoppingItems')
+          .where('homeId', '==', homeId)
+          .where('purchased', '==', false)
+          .limit(3)
+          .get()
+          .then((snapshot) => {
+            if (snapshot.empty) {
+              shoppingListCard.innerHTML = '<p class="empty-message">¡La lista de compra está vacía!</p>';
+              return;
+            }
+            
+            let itemsHTML = '<ul class="dashboard-list">';
+            
+            snapshot.forEach((doc) => {
+              const item = doc.data();
+              const categoryIcon = getCategoryIcon(item.category);
+              
+              itemsHTML += `
+                <li class="dashboard-item">
+                  <div class="dashboard-item-icon">${categoryIcon}</div>
+                  <div class="dashboard-item-title">${item.name}</div>
+                </li>
+              `;
+            });
+            
+            itemsHTML += '</ul>';
+            shoppingListCard.innerHTML = itemsHTML;
+          })
+          .catch((error) => {
+            console.error("Error al cargar lista de compra:", error);
+            shoppingListCard.innerHTML = '<p class="error-message">Error al cargar la lista</p>';
+          });
+      }
+      
+      // Cargar próximos eventos (con mejor visualización)
+function loadUpcomingEvents() {
+  const upcomingEventsCard = document.getElementById('upcomingEventsCard');
+  const homeId = getCurrentHome();
+  
+  if (!homeId) {
+    upcomingEventsCard.innerHTML = '<p class="empty-message">No hay un hogar seleccionado</p>';
+    return;
+  }
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  db.collection('events')
+    .where('homeId', '==', homeId)
+    .where('startDate', '>=', today)
+    .orderBy('startDate', 'asc')
+    .limit(3)
+    .get()
+    .then((snapshot) => {
+      if (snapshot.empty) {
+        upcomingEventsCard.innerHTML = '<p class="empty-message">No hay eventos próximos</p>';
+        return;
+      }
+      
+      let eventsHTML = '<ul class="dashboard-list">';
+      
+      snapshot.forEach((doc) => {
+        const event = doc.data();
+        const startDate = new Date(event.startDate.seconds * 1000);
+        
+        // Formatear la fecha de manera más bonita
+        const day = startDate.getDate();
+        const month = startDate.toLocaleString('es', { month: 'short' });
+        const year = startDate.getFullYear();
+        const formattedDate = `${day} ${month} ${year}`;
+        
+        eventsHTML += `
+          <li class="event-item">
+            <div class="event-date">
+              <div class="event-day">${day}</div>
+              <div class="event-month">${month}</div>
+            </div>
+            <div class="event-info">
+              <div class="event-title">${event.title}</div>
+              <div class="event-time">${startDate.toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', hour12: false })}</div>
+            </div>
+          </li>
+        `;
+      });
+      
+      eventsHTML += '</ul>';
+      upcomingEventsCard.innerHTML = eventsHTML;
+    })
+    .catch((error) => {
+      console.error("Error al cargar eventos:", error);
+      upcomingEventsCard.innerHTML = '<p class="error-message">Error al cargar eventos</p>';
+    });
+}
+      
+      // Cargar actividad reciente
+      // Cargar actividad reciente (versión mejorada con datos reales)
+// Cargar actividad reciente (versión mejorada con nombres correctos)
+function loadRecentActivity() {
+  const recentActivityCard = document.getElementById('recentActivityCard');
+  const homeId = getCurrentHome();
+  
+  if (!homeId) {
+    recentActivityCard.innerHTML = '<p class="empty-message">No hay un hogar seleccionado</p>';
+    return;
+  }
+  
+  recentActivityCard.innerHTML = '<div class="loader"></div>';
+  
+  // Array para almacenar todas las actividades
+  let allActivities = [];
+  
+  // Mapa para almacenar información de usuarios por ID
+  const userInfoMap = {};
+  
+  // Primero, cargar información de todos los miembros del hogar
+  db.collection('homes').doc(homeId).get()
+    .then(doc => {
+      if (doc.exists) {
+        const home = doc.data();
+        const memberIds = home.members || [];
+        
+        // Obtener info de cada miembro
+        return Promise.all(memberIds.map(userId => 
+          db.collection('users').doc(userId).get()
+            .then(userDoc => {
+              if (userDoc.exists) {
+                userInfoMap[userId] = {
+                  displayName: userDoc.data().displayName || 'Usuario',
+                  avatar: userDoc.data().avatar || 'default'
+                };
+              } else {
+                userInfoMap[userId] = { displayName: 'Usuario', avatar: 'default' };
+              }
+            })
+        ));
+      }
+      return Promise.resolve();
+    })
+    .then(() => {
+      // Ahora cargar todas las actividades
+      return Promise.all([
+        // 1. Cargar tareas recientes
+        db.collection('tasks')
+          .where('homeId', '==', homeId)
+          .orderBy('createdAt', 'desc')
+          .limit(5)
+          .get()
+          .then(snapshot => {
+            snapshot.forEach(doc => {
+              const task = doc.data();
+              
+              // Obtener datos formateados
+              const timestamp = task.createdAt ? new Date(task.createdAt.seconds * 1000) : new Date();
+              const timeAgo = getTimeAgo(timestamp);
+              
+              // Obtener nombre real del creador
+              const creatorName = task.createdBy && userInfoMap[task.createdBy] 
+                ? userInfoMap[task.createdBy].displayName 
+                : 'Alguien';
+              
+              allActivities.push({
+                type: 'task_created',
+                user: creatorName,
+                userId: task.createdBy,
+                action: 'creó la tarea',
+                subject: task.title,
+                timestamp: timestamp,
+                timeAgo: timeAgo
+              });
+              
+              // Si la tarea está completada
+              if (task.status === 'completed' && task.completedAt) {
+                const completedTimestamp = new Date(task.completedAt.seconds * 1000);
+                const completedTimeAgo = getTimeAgo(completedTimestamp);
+                
+                // Obtener nombre real del completador
+                const completerName = task.completedBy && userInfoMap[task.completedBy] 
+                  ? userInfoMap[task.completedBy].displayName 
+                  : 'Alguien';
+                
+                allActivities.push({
+                  type: 'task_completed',
+                  user: completerName,
+                  userId: task.completedBy || task.createdBy,
+                  action: 'completó la tarea',
+                  subject: task.title,
+                  timestamp: completedTimestamp,
+                  timeAgo: completedTimeAgo
+                });
+              }
+            });
+          }),
+        
+        // 2. Cargar mensajes recientes del chat
+        db.collection('chats').doc(homeId).collection('messages')
+          .orderBy('timestamp', 'desc')
+          .limit(3)
+          .get()
+          .then(snapshot => {
+            snapshot.forEach(doc => {
+              const message = doc.data();
+              
+              // Obtener datos formateados
+              const timestamp = message.timestamp ? new Date(message.timestamp.seconds * 1000) : new Date();
+              const timeAgo = getTimeAgo(timestamp);
+              
+              // Obtener nombre real del remitente
+              const senderName = message.senderId && userInfoMap[message.senderId] 
+                ? userInfoMap[message.senderId].displayName 
+                : (message.senderName || 'Alguien');
+              
+              // Solo mostramos mensajes de otros usuarios, no los propios
+              if (message.senderId !== firebase.auth().currentUser.uid) {
+                allActivities.push({
+                  type: 'chat',
+                  user: senderName,
+                  userId: message.senderId,
+                  action: 'envió un mensaje:',
+                  subject: message.text.length > 30 ? message.text.substring(0, 30) + '...' : message.text,
+                  timestamp: timestamp,
+                  timeAgo: timeAgo
+                });
+              }
+            });
+          }),
+        
+        // 3. Cargar elementos recientes de la lista de compra
+        db.collection('shoppingItems')
+          .where('homeId', '==', homeId)
+          .orderBy('addedAt', 'desc')
+          .limit(3)
+          .get()
+          .then(snapshot => {
+            snapshot.forEach(doc => {
+              const item = doc.data();
+              
+              // Obtener datos formateados
+              const timestamp = item.addedAt ? new Date(item.addedAt.seconds * 1000) : new Date();
+              const timeAgo = getTimeAgo(timestamp);
+              
+              // Obtener nombre real del añadidor
+              const adderName = item.addedBy && userInfoMap[item.addedBy] 
+                ? userInfoMap[item.addedBy].displayName 
+                : 'Alguien';
+              
+              allActivities.push({
+                type: 'shopping',
+                user: adderName,
+                userId: item.addedBy,
+                action: 'añadió a la lista de compra',
+                subject: item.name,
+                timestamp: timestamp,
+                timeAgo: timeAgo
+              });
+            });
+          }),
+        
+        // 4. Cargar documentos recientes
+        db.collection('documents')
+          .where('homeId', '==', homeId)
+          .orderBy('uploadedAt', 'desc')
+          .limit(2)
+          .get()
+          .then(snapshot => {
+            snapshot.forEach(doc => {
+              const document = doc.data();
+              
+              // Obtener datos formateados
+              const timestamp = document.uploadedAt ? new Date(document.uploadedAt.seconds * 1000) : new Date();
+              const timeAgo = getTimeAgo(timestamp);
+              
+              // Obtener nombre real del subidor
+              const uploaderName = document.uploadedBy && userInfoMap[document.uploadedBy] 
+                ? userInfoMap[document.uploadedBy].displayName 
+                : 'Alguien';
+              
+              allActivities.push({
+                type: 'document',
+                user: uploaderName,
+                userId: document.uploadedBy,
+                action: 'subió el documento',
+                subject: document.title,
+                timestamp: timestamp,
+                timeAgo: timeAgo
+              });
+            });
+          }),
+        
+        // 5. Cargar eventos recientes del calendario
+        db.collection('events')
+          .where('homeId', '==', homeId)
+          .orderBy('createdAt', 'desc')
+          .limit(2)
+          .get()
+          .then(snapshot => {
+            snapshot.forEach(doc => {
+              const event = doc.data();
+              
+              // Obtener datos formateados
+              const timestamp = event.createdAt ? new Date(event.createdAt.seconds * 1000) : new Date();
+              const timeAgo = getTimeAgo(timestamp);
+              
+              // Obtener nombre real del creador del evento
+              const creatorName = event.createdBy && userInfoMap[event.createdBy] 
+                ? userInfoMap[event.createdBy].displayName 
+                : 'Alguien';
+              
+              allActivities.push({
+                type: 'event',
+                user: creatorName,
+                userId: event.createdBy,
+                action: 'creó el evento',
+                subject: event.title,
+                timestamp: timestamp,
+                timeAgo: timeAgo
+              });
+            });
+          })
+      ]);
+    })
+    .then(() => {
+      // Ordenar todas las actividades por timestamp (más recientes primero)
+      allActivities.sort((a, b) => b.timestamp - a.timestamp);
+      
+      // Limitar a 5 actividades para mostrar
+      allActivities = allActivities.slice(0, 5);
+      
+      if (allActivities.length === 0) {
+        recentActivityCard.innerHTML = '<p class="empty-message">No hay actividad reciente</p>';
+        return;
+      }
+      
+      let activityHTML = '<ul class="dashboard-list">';
+      
+      allActivities.forEach(activity => {
+        const icon = getActivityIcon(activity.type);
+        
+        activityHTML += `
+          <li class="dashboard-item">
+            <div class="dashboard-item-icon">${icon}</div>
+            <div class="dashboard-item-content">
+              <strong>${activity.user}</strong> ${activity.action} <span class="activity-subject">${activity.subject}</span>
+              <div class="dashboard-item-meta">${activity.timeAgo}</div>
+            </div>
+          </li>
+        `;
+      });
+      
+      activityHTML += '</ul>';
+      recentActivityCard.innerHTML = activityHTML;
+    })
+    .catch(error => {
+      console.error("Error al cargar actividad reciente:", error);
+      recentActivityCard.innerHTML = '<p class="error-message">Error al cargar la actividad reciente</p>';
+    });
+}
+
+// Función mejorada para obtener icono según tipo de actividad
+function getActivityIcon(type) {
+  const icons = {
+    'task_created': '📝',
+    'task_completed': '✅',
+    'shopping': '🛒',
+    'chat': '💬',
+    'event': '📅',
+    'document': '📄'
+  };
+  
+  return icons[type] || '📌';
+}
+
+// Función para formatear tiempo relativo
+function getTimeAgo(date) {
+  const now = new Date();
+  const diffMs = now - date;
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHour = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHour / 24);
+  
+  if (diffSec < 60) return 'Ahora mismo';
+  if (diffMin < 60) return `Hace ${diffMin} ${diffMin === 1 ? 'minuto' : 'minutos'}`;
+  if (diffHour < 24) return `Hace ${diffHour} ${diffHour === 1 ? 'hora' : 'horas'}`;
+  if (diffDay < 7) return `Hace ${diffDay} ${diffDay === 1 ? 'día' : 'días'}`;
+  
+  return date.toLocaleDateString();
+}
+      
+      // Función para obtener icono según categoría
+      function getCategoryIcon(category) {
+        const icons = {
+          'fruits': '🍎',
+          'dairy': '🥛',
+          'bakery': '🍞',
+          'meat': '🥩',
+          'cleaning': '🧹',
+          'other': '📦'
+        };
+        
+        return icons[category] || '📦';
+      }
+      
+      // Función mejorada para obtener icono según tipo de actividad
+function getActivityIcon(type) {
+  const icons = {
+    'task_created': '📝',
+    'task_completed': '✅',
+    'shopping': '🛒',
+    'chat': '💬',
+    'event': '📅',
+    'document': '📄'
+  };
+  
+  return icons[type] || '📌';
+}
+    });
+  </script>
+</body>
+</html>

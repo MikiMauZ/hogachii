@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Familiar - CasitaFeliz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/kawaii-theme.css">
+</head>
+<body>
+  <header>
+  <nav>
+    <!-- Menú hamburguesa para móviles (ahora a la izquierda) -->
+    <div class="hamburger-menu" id="hamburgerMenu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    
+    <!-- Logo clickable -->
+    <a href="index.html" class="logo">CasitaFeliz</a>
+    
+    <ul class="menu">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="tasks.html">Tareas</a></li>
+      <li><a href="shopping.html">Compras</a></li>
+      <li><a href="calendar.html">Calendario</a></li>
+      <li><a href="documents.html">Documentos</a></li>
+      <li><a href="chat.html">Chat</a></li>
+    </ul>
+    
+    <!-- Versión móvil del menú (más elegante) -->
+    <div class="menu-mobile" id="mobileMenu">
+      <div class="menu-mobile-logo">CasitaFeliz</div>
+      <ul>
+        <li><a href="index.html"><span class="menu-icon">🏠</span> Inicio</a></li>
+        <li><a href="tasks.html"><span class="menu-icon">✅</span> Tareas</a></li>
+        <li><a href="shopping.html"><span class="menu-icon">🛒</span> Compras</a></li>
+        <li><a href="calendar.html"><span class="menu-icon">📅</span> Calendario</a></li>
+        <li><a href="documents.html"><span class="menu-icon">📄</span> Documentos</a></li>
+        <li><a href="chat.html"><span class="menu-icon">💬</span> Chat</a></li>
+      </ul>
+    </div>
+    
+    <div class="user-menu" id="userMenu">
+      <!-- Se rellena con JavaScript -->
+    </div>
+  </nav>
+</header>
+
+  <main>
+    <h1>Chat Familiar <span class="kawaii-icon">💬</span></h1>
+    
+    <div class="chat-container">
+      <div class="chat-members" id="chatMembers">
+        <!-- Se rellena con JavaScript -->
+        <div class="loader"></div>
+      </div>
+      
+      <div class="chat-messages">
+        <div class="messages-container" id="messagesContainer">
+          <!-- Se rellena con JavaScript -->
+          <div class="loader"></div>
+        </div>
+        
+        <div class="message-input">
+          <div class="emoji-picker-btn" id="emojiPickerBtn">😊</div>
+          <input type="text" id="messageInput" placeholder="Escribe un mensaje...">
+          <button class="send-btn" id="sendMessageBtn">Enviar</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Emoji Picker (inicialmente oculto) -->
+    <div class="emoji-picker" id="emojiPicker" style="display: none;">
+      <div class="emoji-list">
+        <!-- Emojis comunes -->
+        <span class="emoji">😊</span>
+        <span class="emoji">😁</span>
+        <span class="emoji">❤️</span>
+        <span class="emoji">👍</span>
+        <span class="emoji">🎉</span>
+        <span class="emoji">👏</span>
+        <span class="emoji">😍</span>
+        <span class="emoji">🥰</span>
+        <span class="emoji">👋</span>
+        <span class="emoji">🙌</span>
+        <span class="emoji">✨</span>
+        <span class="emoji">🌟</span>
+        <span class="emoji">🤔</span>
+        <span class="emoji">😂</span>
+        <span class="emoji">🥳</span>
+        <span class="emoji">👨‍👩‍👧‍👦</span>
+        <span class="emoji">🏠</span>
+        <span class="emoji">💕</span>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>CasitaFeliz &copy; 2025</p>
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+  
+  <script src="js/firebase-config.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/chat.js"></script>
+</body>
+</html>

@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Perfil - CasitaFeliz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/kawaii-theme.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    .profile-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    
+    @media (min-width: 768px) {
+      .profile-container {
+        grid-template-columns: 300px 1fr;
+      }
+    }
+    
+    .profile-card {
+      background-color: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background-color: #ffb0cd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 48px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    
+    .profile-name {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 5px;
+    }
+    
+    .profile-email {
+      color: #777;
+      margin-bottom: 20px;
+    }
+    
+    .profile-actions {
+      margin-top: 20px;
+      width: 100%;
+    }
+    
+    .profile-actions button {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    
+    .profile-details {
+      background-color: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .profile-section {
+      margin-bottom: 30px;
+    }
+    
+    .profile-section h2 {
+      color: #ff6b9d;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #ffdfec;
+      padding-bottom: 10px;
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .form-col {
+      flex: 1;
+    }
+    
+    .avatar-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .avatar-option {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: transform 0.3s;
+    }
+    
+    .avatar-option:hover {
+      transform: scale(1.1);
+    }
+    
+    .avatar-option.selected {
+      border-color: #ff6b9d;
+    }
+    
+    .color-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .color-option {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: transform 0.3s;
+    }
+    
+    .color-option:hover {
+      transform: scale(1.1);
+    }
+    
+    .color-option.selected {
+      border-color: #333;
+    }
+    
+    .home-card {
+      background-color: #f9f9f9;
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .home-card.active {
+      background-color: #ffdfec;
+      border-left: 4px solid #ff6b9d;
+    }
+    
+    .home-info {
+      flex-grow: 1;
+      margin-bottom: 10px;
+    }
+    
+    .home-name {
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 5px;
+      color: #333;
+    }
+    
+    .home-members {
+      font-size: 14px;
+      color: #777;
+      margin-bottom: 8px;
+    }
+    
+    .home-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+    
+    /* Estilos para la sección de ID del hogar */
+    .home-id-container {
+      margin-top: 10px;
+      padding: 8px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    
+    .home-id-label {
+      font-weight: bold;
+      color: #ff6b9d;
+      margin-bottom: 5px;
+    }
+    
+    .home-id-value {
+      font-family: monospace;
+      padding: 5px;
+      background-color: white;
+      border: 1px dashed #ffb0cd;
+      border-radius: 4px;
+      margin-bottom: 5px;
+      word-break: break-all;
+    }
+    
+    .copy-id-btn {
+      background-color: #e6f7ff;
+      color: #2d9cdb;
+      border: none;
+      border-radius: 4px;
+      padding: 5px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .copy-id-btn:hover {
+      background-color: #bae7ff;
+    }
+    
+    @media (max-width: 768px) {
+      .profile-details {
+        padding: 20px 15px;
+      }
+      
+      .form-row {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .home-card {
+        padding: 12px;
+      }
+      
+      .home-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .home-actions button {
+        margin-top: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+  <nav>
+    <!-- Menú hamburguesa para móviles (ahora a la izquierda) -->
+    <div class="hamburger-menu" id="hamburgerMenu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    
+    <!-- Logo clickable -->
+    <a href="index.html" class="logo">CasitaFeliz</a>
+    
+    <ul class="menu">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="tasks.html">Tareas</a></li>
+      <li><a href="shopping.html">Compras</a></li>
+      <li><a href="calendar.html">Calendario</a></li>
+      <li><a href="documents.html">Documentos</a></li>
+      <li><a href="chat.html">Chat</a></li>
+    </ul>
+    
+    <!-- Versión móvil del menú (más elegante) -->
+    <div class="menu-mobile" id="mobileMenu">
+      <div class="menu-mobile-logo">CasitaFeliz</div>
+      <ul>
+        <li><a href="index.html"><span class="menu-icon">🏠</span> Inicio</a></li>
+        <li><a href="tasks.html"><span class="menu-icon">✅</span> Tareas</a></li>
+        <li><a href="shopping.html"><span class="menu-icon">🛒</span> Compras</a></li>
+        <li><a href="calendar.html"><span class="menu-icon">📅</span> Calendario</a></li>
+        <li><a href="documents.html"><span class="menu-icon">📄</span> Documentos</a></li>
+        <li><a href="chat.html"><span class="menu-icon">💬</span> Chat</a></li>
+      </ul>
+    </div>
+    
+    <div class="user-menu" id="userMenu">
+      <!-- Se rellena con JavaScript -->
+    </div>
+  </nav>
+</header>
+
+  <main>
+    <h1>Mi Perfil <span class="kawaii-icon">👤</span></h1>
+    
+    <div class="profile-container">
+      <div class="profile-card">
+        <div class="profile-avatar" id="profileAvatarDisplay">A</div>
+        <div class="profile-name" id="profileNameDisplay">Cargando...</div>
+        <div class="profile-email" id="profileEmailDisplay">Cargando...</div>
+        
+        <div class="profile-actions">
+          <button id="editProfileBtn" class="kawaii-btn">Editar Perfil</button>
+          <button id="logoutBtn" class="btn-secondary">Cerrar Sesión</button>
+        </div>
+      </div>
+      
+      <div class="profile-details">
+        <div class="profile-section">
+          <h2>Detalles Personales</h2>
+          <form id="profileForm">
+            <div class="form-row">
+              <div class="form-col">
+                <div class="form-group">
+                  <label for="displayName">Nombre</label>
+                  <input type="text" id="displayName" name="displayName" placeholder="Tu nombre">
+                </div>
+              </div>
+              <div class="form-col">
+                <div class="form-group">
+                  <label>Email</label>
+                  <input type="email" id="email" disabled>
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Avatar</label>
+              <div class="avatar-selector" id="avatarSelector">
+                <!-- Se rellena con JavaScript -->
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Color Favorito</label>
+              <div class="color-selector" id="colorSelector">
+                <!-- Se rellena con JavaScript -->
+              </div>
+            </div>
+            
+            <button type="submit" class="kawaii-btn mt-20">Guardar Cambios</button>
+          </form>
+        </div>
+        
+        <div class="profile-section">
+          <h2>Mis Hogares</h2>
+          <div id="homesList">
+            <!-- Se rellena con JavaScript -->
+            <div class="loader"></div>
+          </div>
+          
+          <div class="form-group mt-20">
+            <button id="createHomeBtn" class="kawaii-btn">Crear Nuevo Hogar</button>
+            <button id="joinHomeBtn" class="btn-secondary mt-20">Unirse a un Hogar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Modal para Crear Hogar -->
+    <div class="modal-overlay" id="createHomeModal" style="display: none;">
+      <div class="modal-content">
+        <button class="modal-close" id="closeCreateHomeModal">&times;</button>
+        <h2 class="modal-title">Crear Nuevo Hogar</h2>
+        
+        <form id="createHomeForm">
+          <div class="form-group">
+            <label for="homeName">Nombre del Hogar</label>
+            <input type="text" id="homeName" name="homeName" required placeholder="Ej: Mi Dulce Hogar">
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" id="cancelCreateHomeBtn" class="btn-secondary">Cancelar</button>
+            <button type="submit" class="kawaii-btn">Crear Hogar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Modal para Unirse a Hogar -->
+    <div class="modal-overlay" id="joinHomeModal" style="display: none;">
+      <div class="modal-content">
+        <button class="modal-close" id="closeJoinHomeModal">&times;</button>
+        <h2 class="modal-title">Unirse a un Hogar</h2>
+        
+        <form id="joinHomeForm">
+          <div class="form-group">
+            <label for="homeId">ID del Hogar</label>
+            <input type="text" id="homeId" name="homeId" required placeholder="ID proporcionado por otro miembro">
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" id="cancelJoinHomeBtn" class="btn-secondary">Cancelar</button>
+            <button type="submit" class="kawaii-btn">Unirse</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>CasitaFeliz &copy; 2025</p>
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+  
+  <script src="js/firebase-config.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Referencias a elementos del DOM
+      const profileForm = document.getElementById('profileForm');
+      const profileNameDisplay = document.getElementById('profileNameDisplay');
+      const profileEmailDisplay = document.getElementById('profileEmailDisplay');
+      const profileAvatarDisplay = document.getElementById('profileAvatarDisplay');
+      const avatarSelector = document.getElementById('avatarSelector');
+      const colorSelector = document.getElementById('colorSelector');
+      const homesList = document.getElementById('homesList');
+      const createHomeBtn = document.getElementById('createHomeBtn');
+      const joinHomeBtn = document.getElementById('joinHomeBtn');
+      const createHomeModal = document.getElementById('createHomeModal');
+      const closeCreateHomeModal = document.getElementById('closeCreateHomeModal');
+      const cancelCreateHomeBtn = document.getElementById('cancelCreateHomeBtn');
+      const createHomeForm = document.getElementById('createHomeForm');
+      const joinHomeModal = document.getElementById('joinHomeModal');
+      const closeJoinHomeModal = document.getElementById('closeJoinHomeModal');
+      const cancelJoinHomeBtn = document.getElementById('cancelJoinHomeBtn');
+      const joinHomeForm = document.getElementById('joinHomeForm');
+      const logoutBtn = document.getElementById('logoutBtn');
+      
+      // Estado para opciones seleccionadas
+      let selectedAvatar = 'default';
+      let selectedColor = '#ff6b9d';
+      
+      // Verificar autenticación
+      checkAuth().then(user => {
+        // Inicializar perfil
+        loadProfileData(user);
+        
+        // Cargar hogares
+        loadHomes(user.uid);
+        
+        // Inicializar selectores
+        initAvatarSelector();
+        initColorSelector();
+        
+        // Setup de eventos
+        setupEventListeners();
+      }).catch(error => {
+        console.error("Error de autenticación:", error);
+      });
+      
+      function setupEventListeners() {
+        // Formulario de perfil
+        profileForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          updateProfile();
+        });
+        
+        // Botón de cerrar sesión
+        logoutBtn.addEventListener('click', () => {
+          logoutUser();
+        });
+        
+        // Botones para modales
+        createHomeBtn.addEventListener('click', () => {
+          openModal(createHomeModal);
+        });
+        
+        closeCreateHomeModal.addEventListener('click', () => {
+          closeModal(createHomeModal);
+        });
+        
+        cancelCreateHomeBtn.addEventListener('click', () => {
+          closeModal(createHomeModal);
+        });
+        
+        joinHomeBtn.addEventListener('click', () => {
+          openModal(joinHomeModal);
+        });
+        
+        closeJoinHomeModal.addEventListener('click', () => {
+          closeModal(joinHomeModal);
+        });
+        
+        cancelJoinHomeBtn.addEventListener('click', () => {
+          closeModal(joinHomeModal);
+        });
+        
+        // Escuchar clic fuera de los modales para cerrar
+        createHomeModal.addEventListener('click', (e) => {
+          if (e.target === createHomeModal) {
+            closeModal(createHomeModal);
+          }
+        });
+        
+        joinHomeModal.addEventListener('click', (e) => {
+          if (e.target === joinHomeModal) {
+            closeModal(joinHomeModal);
+          }
+        });
+        
+        // Formularios de hogares
+        createHomeForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          createNewHome();
+        });
+        
+        joinHomeForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          joinExistingHome();
+        });
+      }
+      
+      // Cargar datos del perfil
+      function loadProfileData(user) {
+        // Mostrar email desde Auth
+        document.getElementById('email').value = user.email;
+        profileEmailDisplay.textContent = user.email;
+        
+        // Mostrar nombre desde Auth inicialmente
+        const displayName = user.displayName || 'Usuario';
+        document.getElementById('displayName').value = displayName;
+        profileNameDisplay.textContent = displayName;
+        profileAvatarDisplay.textContent = displayName.charAt(0).toUpperCase();
+        
+        // Buscar datos adicionales en Firestore
+        getUserProfile(user.uid)
+          .then(profile => {
+            // Actualizar nombre si existe
+            if (profile.displayName) {
+              document.getElementById('displayName').value = profile.displayName;
+              profileNameDisplay.textContent = profile.displayName;
+              profileAvatarDisplay.textContent = profile.displayName.charAt(0).toUpperCase();
+            }
+            
+            // Actualizar avatar seleccionado
+            if (profile.avatar && profile.avatar !== 'default') {
+              selectedAvatar = profile.avatar;
+              updateAvatarSelection();
+              
+              // Actualizar la visualización del avatar
+              if (selectedAvatar === 'cat') {
+                profileAvatarDisplay.textContent = '🐱';
+              } else if (selectedAvatar === 'dog') {
+                profileAvatarDisplay.textContent = '🐶';
+              } else if (selectedAvatar === 'rabbit') {
+                profileAvatarDisplay.textContent = '🐰';
+              } else if (selectedAvatar === 'bear') {
+                profileAvatarDisplay.textContent = '🐻';
+              } else if (selectedAvatar === 'panda') {
+                profileAvatarDisplay.textContent = '🐼';
+              }
+            }
+            
+            // Actualizar color seleccionado
+            if (profile.color) {
+              selectedColor = profile.color;
+              profileAvatarDisplay.style.backgroundColor = selectedColor;
+              updateColorSelection();
+            }
+          })
+          .catch(error => {
+            console.error("Error al cargar perfil:", error);
+          });
+      }
+      
+      // Inicializar selector de avatares
+      function initAvatarSelector() {
+        // Opciones de avatar con emojis
+        avatarSelector.innerHTML = `
+          <div class="avatar-option selected" data-avatar="default">
+            <span style="font-size: 24px;">👤</span>
+          </div>
+          <div class="avatar-option" data-avatar="cat">
+            <span style="font-size: 24px;">🐱</span>
+          </div>
+          <div class="avatar-option" data-avatar="dog">
+            <span style="font-size: 24px;">🐶</span>
+          </div>
+          <div class="avatar-option" data-avatar="rabbit">
+            <span style="font-size: 24px;">🐰</span>
+          </div>
+          <div class="avatar-option" data-avatar="bear">
+            <span style="font-size: 24px;">🐻</span>
+          </div>
+          <div class="avatar-option" data-avatar="panda">
+            <span style="font-size: 24px;">🐼</span>
+          </div>
+        `;
+        
+        // Añadir eventos a las opciones
+        document.querySelectorAll('.avatar-option').forEach(option => {
+          option.addEventListener('click', () => {
+            selectedAvatar = option.dataset.avatar;
+            updateAvatarSelection();
+            
+            // Actualizar inmediatamente el avatar mostrado
+            if (selectedAvatar === 'default') {
+              const displayName = document.getElementById('displayName').value;
+              profileAvatarDisplay.textContent = displayName.charAt(0).toUpperCase();
+            } else if (selectedAvatar === 'cat') {
+              profileAvatarDisplay.textContent = '🐱';
+            } else if (selectedAvatar === 'dog') {
+              profileAvatarDisplay.textContent = '🐶';
+            } else if (selectedAvatar === 'rabbit') {
+              profileAvatarDisplay.textContent = '🐰';
+            } else if (selectedAvatar === 'bear') {
+              profileAvatarDisplay.textContent = '🐻';
+            } else if (selectedAvatar === 'panda') {
+              profileAvatarDisplay.textContent = '🐼';
+            }
+          });
+        });
+      }
+      
+      // Actualizar selección de avatar
+      function updateAvatarSelection() {
+        document.querySelectorAll('.avatar-option').forEach(option => {
+          if (option.dataset.avatar === selectedAvatar) {
+            option.classList.add('selected');
+          } else {
+            option.classList.remove('selected');
+          }
+        });
+      }
+      
+      // Inicializar selector de colores
+      function initColorSelector() {
+        const colors = [
+          '#ff6b9d', // Rosa
+          '#2d9cdb', // Azul
+          '#27ae60', // Verde
+          '#9b51e0', // Púrpura
+          '#f2c94c', // Amarillo
+          '#f2994a'  // Naranja
+        ];
+        
+        let colorsHTML = '';
+        
+        colors.forEach(color => {
+          colorsHTML += `
+            <div class="color-option ${color === selectedColor ? 'selected' : ''}" 
+                 data-color="${color}" 
+                 style="background-color: ${color};">
+            </div>
+          `;
+        });
+        
+        colorSelector.innerHTML = colorsHTML;
+        
+        // Añadir eventos a las opciones
+        document.querySelectorAll('.color-option').forEach(option => {
+          option.addEventListener('click', () => {
+            selectedColor = option.dataset.color;
+            profileAvatarDisplay.style.backgroundColor = selectedColor;
+            updateColorSelection();
+          });
+        });
+      }
+      
+      // Actualizar selección de color
+      function updateColorSelection() {
+        document.querySelectorAll('.color-option').forEach(option => {
+          if (option.dataset.color === selectedColor) {
+            option.classList.add('selected');
+          } else {
+            option.classList.remove('selected');
+          }
+        });
+      }
+      
+      // Actualizar perfil
+      function updateProfile() {
+        const user = firebase.auth().currentUser;
+        if (!user) return;
+        
+        const displayName = document.getElementById('displayName').value.trim();
+        
+        if (!displayName) {
+          showNotification('El nombre es obligatorio', 'error');
+          return;
+        }
+        
+        // Datos a actualizar
+        const profileData = {
+          displayName,
+          avatar: selectedAvatar,
+          color: selectedColor,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        
+        // Actualizar en Firestore
+        updateUserProfile(user.uid, profileData)
+          .then(() => {
+            // Actualizar UI
+            profileNameDisplay.textContent = displayName;
+            if (selectedAvatar === 'default') {
+              profileAvatarDisplay.textContent = displayName.charAt(0).toUpperCase();
+            }
+            profileAvatarDisplay.style.backgroundColor = selectedColor;
+            
+            showNotification('Perfil actualizado correctamente', 'success');
+          })
+          .catch(error => {
+            console.error("Error al actualizar perfil:", error);
+            showNotification('Error al actualizar el perfil', 'error');
+          });
+      }
+      
+      // Cargar hogares del usuario
+      function loadHomes(userId) {
+        homesList.innerHTML = '<div class="loader"></div>';
+        
+        getUserHomes(userId)
+          .then(homes => {
+            if (homes.length === 0) {
+              homesList.innerHTML = '<p class="empty-message">No perteneces a ningún hogar todavía.</p>';
+              return;
+            }
+            
+            // Obtener ID del hogar actual
+            const currentHomeId = getCurrentHome();
+            
+            let homesHTML = '';
+            
+            homes.forEach(home => {
+              const isActive = home.id === currentHomeId;
+              
+              homesHTML += `
+                <div class="home-card ${isActive ? 'active' : ''}" data-id="${home.id}">
+                  <div class="home-info">
+                    <div class="home-name">${home.name}</div>
+                    <div class="home-members">${home.members.length} miembros</div>
+                    ${isActive ? `
+                      <div class="home-id-container">
+                        <div class="home-id-label">ID para invitar miembros:</div>
+                        <div class="home-id-value">${home.id}</div>
+                        <button class="copy-id-btn" data-id="${home.id}">📋 Copiar ID</button>
+                      </div>
+                    ` : ''}
+                  </div>
+                  <div class="home-actions">
+                    ${isActive 
+                      ? '<span class="tag tag-green">Activo</span>' 
+                      : `<button class="btn-secondary switch-home-btn" data-id="${home.id}">Cambiar</button>`}
+                  </div>
+                </div>
+              `;
+            });
+            
+            homesList.innerHTML = homesHTML;
+            
+            // Añadir event listeners a los botones de cambio
+            document.querySelectorAll('.switch-home-btn').forEach(btn => {
+              btn.addEventListener('click', () => {
+                const homeId = btn.dataset.id;
+                switchHome(homeId);
+              });
+            });
+            
+            // Añadir event listeners a los botones de copiar ID
+            document.querySelectorAll('.copy-id-btn').forEach(btn => {
+              btn.addEventListener('click', () => {
+                const homeId = btn.dataset.id;
+                copyToClipboard(homeId);
+                showNotification('ID copiado al portapapeles', 'success');
+              });
+            });
+          })
+          .catch(error => {
+            console.error("Error al cargar hogares:", error);
+            homesList.innerHTML = '<p class="error-message">Error al cargar los hogares</p>';
+          });
+      }
+      
+      // Función para copiar al portapapeles
+      function copyToClipboard(text) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      
+      // Cambiar hogar activo
+      function switchHome(homeId) {
+        // Guardar en localStorage
+        setCurrentHome(homeId);
+        
+        // Mostrar notificación
+        showNotification('Hogar cambiado correctamente', 'success');
+        
+        // Recargar lista de hogares
+        loadHomes(firebase.auth().currentUser.uid);
+        
+        // Recargar página después de un breve retraso
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1000);
+      }
+      
+      // Crear nuevo hogar
+      function createNewHome() {
+        const user = firebase.auth().currentUser;
+        if (!user) return;
+        
+        const homeName = document.getElementById('homeName').value.trim();
+        
+        if (!homeName) {
+          showNotification('El nombre del hogar es obligatorio', 'error');
+          return;
+        }
+        
+        // Crear hogar en Firestore
+        db.collection('homes').add({
+          name: homeName,
+          members: [user.uid],
+          createdBy: user.uid,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        .then((docRef) => {
+          // Guardar ID en localStorage
+          setCurrentHome(docRef.id);
+          
+          showNotification('Hogar creado correctamente', 'success');
+          closeModal(createHomeModal);
+          
+          // Recargar lista de hogares
+          loadHomes(user.uid);
+          
+          // Limpiar formulario
+          document.getElementById('homeName').value = '';
+        })
+        .catch((error) => {
+          console.error("Error al crear hogar:", error);
+          showNotification('Error al crear el hogar', 'error');
+        });
+      }
+      
+      // Unirse a un hogar existente
+      function joinExistingHome() {
+        const user = firebase.auth().currentUser;
+        if (!user) return;
+        
+        const homeId = document.getElementById('homeId').value.trim();
+        
+        if (!homeId) {
+          showNotification('El ID del hogar es obligatorio', 'error');
+          return;
+        }
+        
+        // Verificar que el hogar existe
+        db.collection('homes').doc(homeId).get()
+          .then((doc) => {
+            if (!doc.exists) {
+              showNotification('El hogar no existe', 'error');
+              return Promise.reject('Hogar no encontrado');
+            }
+            
+            // Verificar que el usuario no es ya miembro
+            const homeData = doc.data();
+            if (homeData.members && homeData.members.includes(user.uid)) {
+              showNotification('Ya eres miembro de este hogar', 'info');
+              closeModal(joinHomeModal);
+              return Promise.reject('Ya es miembro');
+            }
+            
+            // Añadir usuario al hogar
+            return db.collection('homes').doc(homeId).update({
+              members: firebase.firestore.FieldValue.arrayUnion(user.uid)
+            });
+          })
+          .then(() => {
+            // Guardar ID en localStorage
+            setCurrentHome(homeId);
+            
+            showNotification('Te has unido al hogar correctamente', 'success');
+            closeModal(joinHomeModal);
+            
+            // Recargar lista de hogares
+            loadHomes(user.uid);
+            
+            // Limpiar formulario
+            document.getElementById('homeId').value = '';
+
+            // Recargar lista de hogares
+            loadHomes(user.uid);
+            
+            // Limpiar formulario
+            document.getElementById('homeId').value = '';
+            
+            // Recargar página después de un breve retraso
+            setTimeout(() => {
+              window.location.href = 'index.html';
+            }, 1000);
+          })
+          .catch((error) => {
+            if (error === 'Hogar no encontrado' || error === 'Ya es miembro') {
+              return;
+            }
+            console.error("Error al unirse al hogar:", error);
+            showNotification('Error al unirse al hogar', 'error');
+          });
+      }
+      
+      // Funciones para manejar modales
+      
+      function openModal(modal) {
+        modal.style.display = 'flex';
+      }
+      
+      function closeModal(modal) {
+        modal.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tareas - CasitaFeliz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/kawaii-theme.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+  <header>
+  <nav>
+    <!-- Menú hamburguesa para móviles (ahora a la izquierda) -->
+    <div class="hamburger-menu" id="hamburgerMenu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    
+    <!-- Logo clickable -->
+    <a href="index.html" class="logo">CasitaFeliz</a>
+    
+    <ul class="menu">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="tasks.html">Tareas</a></li>
+      <li><a href="shopping.html">Compras</a></li>
+      <li><a href="calendar.html">Calendario</a></li>
+      <li><a href="documents.html">Documentos</a></li>
+      <li><a href="chat.html">Chat</a></li>
+    </ul>
+    
+    <!-- Versión móvil del menú (más elegante) -->
+    <div class="menu-mobile" id="mobileMenu">
+      <div class="menu-mobile-logo">CasitaFeliz</div>
+      <ul>
+        <li><a href="index.html"><span class="menu-icon">🏠</span> Inicio</a></li>
+        <li><a href="tasks.html"><span class="menu-icon">✅</span> Tareas</a></li>
+        <li><a href="shopping.html"><span class="menu-icon">🛒</span> Compras</a></li>
+        <li><a href="calendar.html"><span class="menu-icon">📅</span> Calendario</a></li>
+        <li><a href="documents.html"><span class="menu-icon">📄</span> Documentos</a></li>
+        <li><a href="chat.html"><span class="menu-icon">💬</span> Chat</a></li>
+      </ul>
+    </div>
+    
+    <div class="user-menu" id="userMenu">
+      <!-- Se rellena con JavaScript -->
+    </div>
+  </nav>
+</header>
+
+  <main>
+    <h1>Tareas del Hogar <span class="kawaii-icon">✅</span></h1>
+    
+    <div class="tasks-container">
+      <div class="tasks-header">
+        <button id="addTaskBtn" class="kawaii-btn">
+          <span>Nueva Tarea</span>
+        </button>
+        
+        <div class="tasks-filters">
+        <button class="kawaii-filter active" data-status="pending">Pendientes</button>
+        <button class="kawaii-filter" data-status="completed">Completadas</button>
+        </div>
+      </div>
+      
+      <div class="tasks-list" id="tasksList">
+        <!-- Se rellena con JavaScript -->
+        <div class="loader"></div>
+      </div>
+    </div>
+    
+    <!-- Modal para Nueva Tarea -->
+    <div class="modal-overlay" id="taskModal" style="display: none;">
+      <div class="modal-content">
+        <button class="modal-close" id="closeTaskModal">&times;</button>
+        <h2 class="modal-title">Nueva Tarea</h2>
+        <form id="taskForm">
+          <div class="form-group">
+            <label for="taskTitle">Título de la Tarea</label>
+            <input type="text" id="taskTitle" name="taskTitle" required placeholder="¿Qué hay que hacer?">
+          </div>
+          
+          <div class="form-group">
+            <label for="taskDescription">Descripción (opcional)</label>
+            <textarea id="taskDescription" name="taskDescription" rows="3" placeholder="Detalles de la tarea..."></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="taskAssignee">Asignar a</label>
+            <select id="taskAssignee" name="taskAssignee">
+              <option value="">Seleccionar miembro...</option>
+              <!-- Se rellena con JavaScript -->
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="taskDueDate">Fecha límite</label>
+            <input type="date" id="taskDueDate" name="taskDueDate">
+          </div>
+          
+          <div class="form-group">
+            <label for="taskCategory">Categoría</label>
+            <select id="taskCategory" name="taskCategory">
+              <option value="cleaning">Limpieza</option>
+              <option value="maintenance">Mantenimiento</option>
+              <option value="cooking">Cocina</option>
+              <option value="shopping">Compras</option>
+              <option value="other">Otros</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="taskRecurrence">Repetición</label>
+            <select id="taskRecurrence" name="taskRecurrence">
+              <option value="none">No repetir</option>
+              <option value="daily">Diariamente</option>
+              <option value="weekly">Semanalmente</option>
+              <option value="monthly">Mensualmente</option>
+            </select>
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" id="cancelTaskBtn" class="btn-secondary">Cancelar</button>
+            <button type="submit" class="kawaii-btn">Guardar Tarea</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>CasitaFeliz &copy; 2025</p>
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+  
+  <script src="js/firebase-config.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/tasks.js"></script>
+</body>
+</html>
