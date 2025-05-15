@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lista de Compra - CasitaFeliz</title>
+  <title>Lista de Compra - Hogachii</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/components.css">
@@ -21,7 +21,12 @@
     </div>
     
     <!-- Logo clickable -->
-    <a href="index.html" class="logo">CasitaFeliz</a>
+    <a href="index.html" class="logo">
+      <div class="hogachii-logo">
+        <span class="hogachii-h">H</span>
+        <span class="hogachii-text">ogachii</span>
+      </div>
+    </a>
     
     <ul class="menu">
       <li><a href="index.html">Inicio</a></li>
@@ -34,7 +39,7 @@
     
     <!-- Versión móvil del menú (más elegante) -->
     <div class="menu-mobile" id="mobileMenu">
-      <div class="menu-mobile-logo">CasitaFeliz</div>
+      <div class="menu-mobile-logo">Hogachii</div>
       <ul>
         <li><a href="index.html"><span class="menu-icon">🏠</span> Inicio</a></li>
         <li><a href="tasks.html"><span class="menu-icon">✅</span> Tareas</a></li>
@@ -57,37 +62,34 @@
     <div class="shopping-container">
       <div class="add-item-form">
         <input type="text" id="newItemInput" placeholder="¿Qué necesitamos comprar?">
-        <select id="categorySelect">
-          <option value="fruits">Frutas y Verduras</option>
-          <option value="dairy">Lácteos</option>
-          <option value="bakery">Panadería</option>
-          <option value="meat">Carnes</option>
-          <option value="cleaning">Limpieza</option>
-          <option value="other">Otros</option>
+        <select id="supermarketSelect">
+          <option value="other">Otro</option>
+          <!-- Se rellena con JavaScript con los supermercados del usuario -->
         </select>
         <button id="addItemBtn" class="kawaii-btn">Añadir</button>
       </div>
 
       <div class="category-filters">
-        <button class="kawaii-filter active" data-category="all">Todos</button>
-        <button class="kawaii-filter" data-category="fruits">Frutas y Verduras</button>
-        <button class="kawaii-filter" data-category="dairy">Lácteos</button>
-        <button class="kawaii-filter" data-category="bakery">Panadería</button>
-        <button class="kawaii-filter" data-category="meat">Carnes</button>
-        <button class="kawaii-filter" data-category="cleaning">Limpieza</button>
+        <button class="kawaii-filter active" data-supermarket="all">Todos</button>
+        <!-- Se rellena con JavaScript con los supermercados del usuario -->
       </div>
 
       <div class="shopping-list" id="shoppingList">
         <!-- Se rellena con JavaScript -->
         <div class="loader"></div>
       </div>
+      
+      <!-- Información sobre cómo añadir supermercados -->
+      <div class="info-box" style="margin-top: 20px; padding: 15px; background-color: var(--light-peach); border-radius: 15px;">
+        <p><strong>📌 Nota:</strong> Puedes añadir y gestionar tus supermercados desde la sección "Mis Supermercados" en tu <a href="profile.html" style="color: var(--peach); font-weight: bold;">perfil</a>.</p>
+      </div>
     </div>
   </main>
 
   <footer>
-    <p>CasitaFeliz &copy; 2025</p>
+    <p>Hogachii &copy; 2025</p>
   </footer>
-
+  
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>

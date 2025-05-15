@@ -248,6 +248,74 @@
         margin-top: 5px;
       }
     }
+
+    /* Estilos para la sección de supermercados */
+.supermarkets-list {
+  margin-bottom: 20px;
+}
+
+.supermarket-item {
+  display: flex;
+  align-items: center;
+  background-color: #f9f9f9;
+  border-radius: 15px;
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  transition: all 0.3s;
+}
+
+.supermarket-item:hover {
+  background-color: #ffdfec;
+  transform: translateX(5px);
+}
+
+.supermarket-icon {
+  font-size: 20px;
+  margin-right: 12px;
+}
+
+.supermarket-name {
+  flex-grow: 1;
+  font-weight: bold;
+  color: #333;
+}
+
+.supermarket-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.delete-supermarket-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.delete-supermarket-btn:hover {
+  background-color: #ffdfec;
+  color: #ff6b9d;
+}
+
+.input-group {
+  display: flex;
+  gap: 10px;
+}
+
+.input-group input {
+  flex-grow: 1;
+}
+
+.add-supermarket-form {
+  margin-top: 20px;
+}
   </style>
 </head>
 <body>
@@ -261,7 +329,12 @@
     </div>
     
     <!-- Logo clickable -->
-    <a href="index.html" class="logo">CasitaFeliz</a>
+    <a href="index.html" class="logo">
+      <div class="hogachii-logo">
+        <span class="hogachii-h">H</span>
+        <span class="hogachii-text">ogachii</span>
+      </div>
+    </a>
     
     <ul class="menu">
       <li><a href="index.html">Inicio</a></li>
@@ -274,7 +347,7 @@
     
     <!-- Versión móvil del menú (más elegante) -->
     <div class="menu-mobile" id="mobileMenu">
-      <div class="menu-mobile-logo">CasitaFeliz</div>
+      <div class="menu-mobile-logo">Hogachii</div>
       <ul>
         <li><a href="index.html"><span class="menu-icon">🏠</span> Inicio</a></li>
         <li><a href="tasks.html"><span class="menu-icon">✅</span> Tareas</a></li>
@@ -344,35 +417,54 @@
         </div>
         
         <div class="profile-section">
-          <h2>Mis Hogares</h2>
+          <h2>Mis Hogachiis</h2>
           <div id="homesList">
             <!-- Se rellena con JavaScript -->
             <div class="loader"></div>
           </div>
           
           <div class="form-group mt-20">
-            <button id="createHomeBtn" class="kawaii-btn">Crear Nuevo Hogar</button>
-            <button id="joinHomeBtn" class="btn-secondary mt-20">Unirse a un Hogar</button>
+            <button id="createHomeBtn" class="kawaii-btn">Crear Nuevo Hogachii</button>
+            <button id="joinHomeBtn" class="btn-secondary mt-20">Unirse a un Hogachii</button>
           </div>
         </div>
       </div>
     </div>
+
+    <div class="profile-section">
+  <h2>Mis Supermercados</h2>
+  <p>Añade los supermercados donde realizas tus compras para organizar mejor tu lista de compra.</p>
+  
+  <div class="supermarkets-list" id="supermarketsList">
+    <div class="loader"></div>
+  </div>
+  
+  <div class="add-supermarket-form">
+    <div class="form-group">
+      <label for="supermarketName">Nuevo Supermercado</label>
+      <div class="input-group">
+        <input type="text" id="supermarketName" placeholder="Nombre del supermercado">
+        <button class="kawaii-btn" id="addSupermarketBtn">Añadir</button>
+      </div>
+    </div>
+  </div>
+</div>
     
     <!-- Modal para Crear Hogar -->
     <div class="modal-overlay" id="createHomeModal" style="display: none;">
       <div class="modal-content">
         <button class="modal-close" id="closeCreateHomeModal">&times;</button>
-        <h2 class="modal-title">Crear Nuevo Hogar</h2>
+        <h2 class="modal-title">Crear Nuevo Hogachii</h2>
         
         <form id="createHomeForm">
           <div class="form-group">
-            <label for="homeName">Nombre del Hogar</label>
+            <label for="homeName">Nombre del Hogachii</label>
             <input type="text" id="homeName" name="homeName" required placeholder="Ej: Mi Dulce Hogar">
           </div>
           
           <div class="modal-actions">
             <button type="button" id="cancelCreateHomeBtn" class="btn-secondary">Cancelar</button>
-            <button type="submit" class="kawaii-btn">Crear Hogar</button>
+            <button type="submit" class="kawaii-btn">Crear Hogachii</button>
           </div>
         </form>
       </div>
@@ -382,11 +474,11 @@
     <div class="modal-overlay" id="joinHomeModal" style="display: none;">
       <div class="modal-content">
         <button class="modal-close" id="closeJoinHomeModal">&times;</button>
-        <h2 class="modal-title">Unirse a un Hogar</h2>
+        <h2 class="modal-title">Unirse a un Hogachii</h2>
         
         <form id="joinHomeForm">
           <div class="form-group">
-            <label for="homeId">ID del Hogar</label>
+            <label for="homeId">ID del Hogachii</label>
             <input type="text" id="homeId" name="homeId" required placeholder="ID proporcionado por otro miembro">
           </div>
           
@@ -400,7 +492,7 @@
   </main>
 
   <footer>
-    <p>CasitaFeliz &copy; 2025</p>
+    <p>Hogachii &copy; 2025</p>
   </footer>
 
   <!-- Firebase SDK -->
@@ -921,6 +1013,162 @@
       function closeModal(modal) {
         modal.style.display = 'none';
       }
+
+      // Cargar y configurar supermercados
+setupSupermarketsSection();
+
+// Función para configurar la sección de supermercados
+function setupSupermarketsSection() {
+  // Cargar los supermercados actuales
+  loadSupermarkets();
+  
+  // Añadir evento para agregar nuevo supermercado
+  document.getElementById('addSupermarketBtn').addEventListener('click', addSupermarket);
+}
+
+// Cargar los supermercados guardados
+function loadSupermarkets() {
+  const supermarketsList = document.getElementById('supermarketsList');
+  if (!supermarketsList) return;
+  
+  const homeId = getCurrentHome();
+  if (!homeId) {
+    supermarketsList.innerHTML = '<p class="empty-message">No hay un hogar seleccionado</p>';
+    return;
+  }
+  
+  // Mostrar loader
+  supermarketsList.innerHTML = '<div class="loader"></div>';
+  
+  // Buscar supermercados
+  db.collection('supermarkets')
+    .where('homeId', '==', homeId)
+    .get()
+    .then((snapshot) => {
+      if (snapshot.empty) {
+        supermarketsList.innerHTML = '<p class="empty-message">No hay supermercados añadidos. Añade tus supermercados habituales para organizar mejor tu lista de compra.</p>';
+        return;
+      }
+      
+      let supermarketsHTML = '';
+      
+      snapshot.forEach((doc) => {
+        const supermarket = doc.data();
+        
+        supermarketsHTML += `
+          <div class="supermarket-item" data-id="${doc.id}">
+            <div class="supermarket-icon">🏪</div>
+            <div class="supermarket-name">${supermarket.name}</div>
+            <div class="supermarket-actions">
+              <button class="delete-supermarket-btn">🗑️</button>
+            </div>
+          </div>
+        `;
+      });
+      
+      supermarketsList.innerHTML = supermarketsHTML;
+      
+      // Añadir eventos a los botones de eliminar
+      document.querySelectorAll('.delete-supermarket-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation(); // Evitar propagación del evento
+          const supermarketItem = e.target.closest('.supermarket-item');
+          const supermarketId = supermarketItem.dataset.id;
+          
+          deleteSupermarket(supermarketId);
+        });
+      });
+    })
+    .catch((error) => {
+      console.error("Error al cargar supermercados:", error);
+      supermarketsList.innerHTML = '<p class="error-message">Error al cargar los supermercados</p>';
+    });
+}
+
+// Añadir un nuevo supermercado
+function addSupermarket() {
+  const supermarketName = document.getElementById('supermarketName').value.trim();
+  
+  if (!supermarketName) {
+    showNotification('Por favor, introduce el nombre del supermercado', 'error');
+    return;
+  }
+  
+  const homeId = getCurrentHome();
+  if (!homeId) {
+    showNotification('No hay un hogar seleccionado', 'error');
+    return;
+  }
+  
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    showNotification('Usuario no autenticado', 'error');
+    return;
+  }
+  
+  // Crear nuevo supermercado
+  db.collection('supermarkets').add({
+    name: supermarketName,
+    homeId: homeId,
+    createdBy: user.uid,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  })
+  .then(() => {
+    // Limpiar input
+    document.getElementById('supermarketName').value = '';
+    
+    // Recargar lista
+    loadSupermarkets();
+    
+    showNotification('Supermercado añadido correctamente', 'success');
+  })
+  .catch((error) => {
+    console.error("Error al añadir supermercado:", error);
+    showNotification('Error al añadir el supermercado', 'error');
+  });
+}
+
+// Eliminar un supermercado
+function deleteSupermarket(supermarketId) {
+  if (confirm('¿Estás seguro de que quieres eliminar este supermercado? Los productos asociados a él se mostrarán en "Otro".')) {
+    db.collection('supermarkets').doc(supermarketId).delete()
+      .then(() => {
+        // Actualizar los productos asociados a este supermercado
+        const homeId = getCurrentHome();
+        return db.collection('shoppingItems')
+          .where('homeId', '==', homeId)
+          .where('supermarketId', '==', supermarketId)
+          .get()
+          .then((snapshot) => {
+            if (snapshot.empty) {
+              return Promise.resolve(); // No hay productos que actualizar
+            }
+            
+            const batch = db.batch();
+            
+            snapshot.forEach((doc) => {
+              batch.update(doc.ref, {
+                supermarketId: 'other',
+                supermarketName: 'Otro'
+              });
+            });
+            
+            return batch.commit();
+          });
+      })
+      .then(() => {
+        // Recargar lista
+        loadSupermarkets();
+        
+        showNotification('Supermercado eliminado correctamente', 'success');
+      })
+      .catch((error) => {
+        console.error("Error al eliminar supermercado:", error);
+        showNotification('Error al eliminar el supermercado', 'error');
+      });
+  }
+}
+
     });
   </script>
 </body>

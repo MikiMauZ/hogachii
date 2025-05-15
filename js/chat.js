@@ -156,8 +156,9 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }).then(() => {
       // Escuchar nuevos mensajes en tiempo real
+      // Ahora ordenamos de manera ascendente para mostrar los más antiguos primero
       chatRef.collection('messages')
-        .orderBy('timestamp', 'desc')
+        .orderBy('timestamp', 'asc')
         .limit(50)
         .onSnapshot((snapshot) => {
           // Limpiar loader si existe
@@ -176,6 +177,10 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
           }
           
+          // Variable para comprobar si necesitamos auto-scroll
+          // Solo hacemos scroll si el usuario está al final del chat
+          const shouldScroll = isUserAtBottom();
+          
           // Procesar cambios en los mensajes
           snapshot.docChanges().forEach((change) => {
             if (change.type === 'added') {
@@ -183,6 +188,11 @@ document.addEventListener('DOMContentLoaded', function() {
               appendMessageToUI(change.doc.id, message);
             }
           });
+          
+          // Si el usuario estaba en la parte inferior, scroll automático a los nuevos mensajes
+          if (shouldScroll) {
+            scrollToBottom();
+          }
         }, (error) => {
           console.error("Error al cargar mensajes:", error);
           messagesContainer.innerHTML = '<p class="error-message">Error al cargar mensajes</p>';
@@ -191,6 +201,17 @@ document.addEventListener('DOMContentLoaded', function() {
       console.error("Error al inicializar chat:", error);
       messagesContainer.innerHTML = '<p class="error-message">Error al inicializar chat</p>';
     });
+  }
+  
+  // Comprobar si el usuario está al final del chat
+  function isUserAtBottom() {
+    const tolerance = 30; // Margen de tolerancia en píxeles
+    return messagesContainer.scrollHeight - messagesContainer.scrollTop - messagesContainer.clientHeight <= tolerance;
+  }
+  
+  // Hacer scroll al final del contenedor de mensajes
+  function scrollToBottom() {
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
   }
   
   // Enviar un mensaje
@@ -217,6 +238,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }).then(() => {
       // Limpiar input
       messageInput.value = '';
+      
+      // Hacer foco en el input
+      messageInput.focus();
+      
+      // Forzar scroll al fondo cuando enviamos un mensaje
+      setTimeout(scrollToBottom, 100);
     }).catch(error => {
       console.error("Error al enviar mensaje:", error);
       showNotification('Error al enviar el mensaje', 'error');
@@ -249,8 +276,8 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
     `;
     
-    // Insertar al principio (ya que están ordenados por timestamp desc)
-    messagesContainer.insertBefore(messageElement, messagesContainer.firstChild);
+    // Añadir al final del contenedor (ya que ahora están ordenados cronológicamente)
+    messagesContainer.appendChild(messageElement);
   }
   
   // Inicializar selector de emojis

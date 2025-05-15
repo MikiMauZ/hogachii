@@ -147,7 +147,21 @@ document.addEventListener('DOMContentLoaded', function() {
         calendarGrid.innerHTML = '<p class="error-message">Error al cargar el calendario. Es posible que necesites crear un índice en Firebase.</p>';
         showNotification('Error al cargar eventos. Es posible que necesites crear un índice en Firebase.', 'error');
       });
-  }
+
+      loadMonthEvents(homeId, currentYear, currentMonth)
+    .then(() => {
+      generateCalendarDays();
+      
+      // Cargar la lista de próximos eventos
+      loadUpcomingEventsList();
+    })
+    .catch(error => {
+      console.error("Error al cargar eventos:", error);
+      calendarGrid.innerHTML = '<p class="error-message">Error al cargar el calendario. Es posible que necesites crear un índice en Firebase.</p>';
+      showNotification('Error al cargar eventos. Es posible que necesites crear un índice en Firebase.', 'error');
+    });
+}
+  
   
   // Generar los días del calendario
   // Generar los días del calendario
@@ -276,16 +290,22 @@ function generateCalendarDays() {
   }
   
   // Obtener eventos para un día específico
-  function getEventsForDay(day) {
-    return events.filter(event => {
-      const eventDate = event.startDate instanceof Date ? 
-                        event.startDate : 
-                        event.startDate.toDate ? 
-                            event.startDate.toDate() : 
-                            new Date(event.startDate);
-      return eventDate.getDate() === day;
-    });
-  }
+function getEventsForDay(day) {
+  return events.filter(event => {
+    // Obtener la fecha del evento y normalizarla
+    let eventDate;
+    if (event.startDate instanceof Date) {
+      eventDate = event.startDate;
+    } else if (event.startDate && event.startDate.toDate) {
+      eventDate = event.startDate.toDate();
+    } else {
+      eventDate = new Date(event.startDate);
+    }
+    
+    // Comparar solo el día del mes
+    return eventDate.getDate() === day;
+  });
+}
   
   // Mostrar eventos para un día específico
   // Mostrar eventos para un día específico
@@ -341,11 +361,12 @@ function showEventsForDay(day, dayEvents) {
   
   // Botón para añadir nuevo evento
   const addBtn = modal.querySelector('#addNewEventForDayBtn');
-  addBtn.addEventListener('click', () => {
-    document.body.removeChild(modal);
-    const selectedDate = new Date(currentYear, currentMonth, day);
-    openEventModal(selectedDate);
-  });
+addBtn.addEventListener('click', () => {
+  document.body.removeChild(modal);
+  // Crear una fecha específica para ese día, sin componente de tiempo
+  const selectedDate = new Date(currentYear, currentMonth, day, 0, 0, 0, 0);
+  openEventModal(selectedDate);
+});
   
   // Click en un evento para ver detalles
   const eventItems = modal.querySelectorAll('.event-item');
@@ -530,18 +551,18 @@ function getEventTime(event) {
       eventDate.setHours(parseInt(hours, 10), parseInt(minutes, 10));
     }
     
-    // Preparar objeto de evento
-    const eventData = {
-      title,
-      description,
-      startDate: eventDate,
-      allDay: !timeInput,
-      category,
-      participants,
-      homeId,
-      createdBy: user.uid,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    };
+    // En la función addNewEvent, asegúrate de guardar la fecha correctamente
+const eventData = {
+  title,
+  description,
+  startDate: firebase.firestore.Timestamp.fromDate(eventDate), // Usar Timestamp
+  allDay: !timeInput,
+  category,
+  participants,
+  homeId,
+  createdBy: user.uid,
+  createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+};
     
     console.log("Guardando evento:", eventData);
     
@@ -576,25 +597,38 @@ function getEventTime(event) {
   
   // Funciones para manejar modales
   
-  function openEventModal(date) {
-    // Limpiar formulario
-    eventForm.reset();
+  // Función modificada para abrir el modal de evento
+function openEventModal(date) {
+  // Limpiar formulario
+  eventForm.reset();
+  
+  // Si se proporciona una fecha, establecerla en el selector
+  if (date) {
+    // Ajustar la fecha para evitar problemas con zonas horarias
+    // Crear una nueva fecha usando año, mes y día para evitar desplazamiento por zona horaria
+    const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
     
-    // Si se proporciona una fecha, establecerla en el selector
-    if (date) {
-      // Formatear fecha a YYYY-MM-DD para el input date
-      const dateString = date.toISOString().split('T')[0];
-      document.getElementById('eventDate').value = dateString;
-    } else {
-      // Si no hay fecha seleccionada, usar la fecha actual
-      const today = new Date();
-      const dateString = today.toISOString().split('T')[0];
-      document.getElementById('eventDate').value = dateString;
-    }
+    // Formatear fecha manualmente en YYYY-MM-DD para el input date
+    const year = adjustedDate.getFullYear();
+    const month = (adjustedDate.getMonth() + 1).toString().padStart(2, '0'); // +1 porque los meses van de 0-11
+    const day = adjustedDate.getDate().toString().padStart(2, '0');
     
-    // Mostrar modal
-    openModal(eventModal);
+    const dateString = `${year}-${month}-${day}`;
+    document.getElementById('eventDate').value = dateString;
+  } else {
+    // Si no hay fecha seleccionada, usar la fecha actual
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    const day = today.getDate().toString().padStart(2, '0');
+    
+    const dateString = `${year}-${month}-${day}`;
+    document.getElementById('eventDate').value = dateString;
   }
+  
+  // Mostrar modal
+  openModal(eventModal);
+}
   
   function openModal(modal) {
     modal.style.display = 'flex';
@@ -610,6 +644,261 @@ function getEventTime(event) {
   }
   
   // Funciones auxiliares
+
+  // Función para cargar y mostrar la lista de próximos eventos
+function loadUpcomingEventsList() {
+  // Crear el contenedor para la lista de eventos
+  const upcomingEventsContainer = document.createElement('div');
+  upcomingEventsContainer.className = 'upcoming-events-container';
+  upcomingEventsContainer.innerHTML = `
+    <h3 class="upcoming-events-title">
+      <span class="calendar-icon">📆</span> Próximos Eventos
+    </h3>
+    <div id="upcomingEventsList" class="upcoming-events-list">
+      <div class="loader"></div>
+    </div>
+    <button id="showAllEventsBtn" class="kawaii-btn full-width">Ver todos los eventos</button>
+  `;
+  
+  // Insertar después del calendario
+  const calendarContainer = document.querySelector('.calendar-container');
+  calendarContainer.parentNode.insertBefore(upcomingEventsContainer, calendarContainer.nextSibling);
+  
+  // Cargar los eventos
+  loadUpcomingEvents();
+  
+  // Añadir evento al botón
+  document.getElementById('showAllEventsBtn').addEventListener('click', showAllEvents);
+}
+
+// Función para cargar los próximos eventos
+function loadUpcomingEvents() {
+  const upcomingEventsList = document.getElementById('upcomingEventsList');
+  const homeId = getCurrentHome();
+  
+  if (!homeId) {
+    upcomingEventsList.innerHTML = '<p class="empty-message">No hay un hogar seleccionado</p>';
+    return;
+  }
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  // Buscar eventos a partir de hoy
+  db.collection('events')
+    .where('homeId', '==', homeId)
+    .where('startDate', '>=', today)
+    .orderBy('startDate', 'asc')
+    .limit(5) // Limitar a 5 eventos
+    .get()
+    .then((snapshot) => {
+      if (snapshot.empty) {
+        upcomingEventsList.innerHTML = '<p class="empty-message">No hay eventos próximos</p>';
+        return;
+      }
+      
+      let eventsHTML = '';
+      
+      snapshot.forEach((doc) => {
+        const event = doc.data();
+        const eventId = doc.id;
+        
+        // Formatear fecha
+        const startDate = new Date(event.startDate.seconds * 1000);
+        const day = startDate.getDate();
+        const month = getMonthShortName(startDate.getMonth());
+        
+        // Formatear hora
+        let timeStr = "";
+        if (!event.allDay) {
+          const hours = startDate.getHours().toString().padStart(2, '0');
+          const minutes = startDate.getMinutes().toString().padStart(2, '0');
+          timeStr = `${hours}:${minutes}`;
+        } else {
+          timeStr = "Todo el día";
+        }
+        
+        eventsHTML += `
+          <div class="event-list-item" data-id="${eventId}">
+            <div class="event-date-badge">
+              <div class="event-day">${day}</div>
+              <div class="event-month">${month}</div>
+            </div>
+            <div class="event-details">
+              <div class="event-title">${event.title}</div>
+              <div class="event-time">${timeStr}</div>
+            </div>
+          </div>
+        `;
+      });
+      
+      upcomingEventsList.innerHTML = eventsHTML;
+      
+      // Añadir eventos click para ver detalles
+      document.querySelectorAll('.event-list-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const eventId = item.dataset.id;
+          showEventDetails(eventId);
+        });
+      });
+    })
+    .catch((error) => {
+      console.error("Error al cargar próximos eventos:", error);
+      upcomingEventsList.innerHTML = '<p class="error-message">Error al cargar eventos</p>';
+    });
+}
+
+// Función auxiliar para obtener nombre corto del mes
+function getMonthShortName(monthIndex) {
+  const monthsShort = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+  return monthsShort[monthIndex];
+}
+
+// Función para mostrar todos los eventos (modal o nueva página)
+function showAllEvents() {
+  // Aquí podrías implementar un modal grande con todos los eventos
+  // o redirigir a una página específica para ver todos los eventos
+  
+  // Por ahora, como ejemplo, crearemos un modal
+  const homeId = getCurrentHome();
+  if (!homeId) {
+    showNotification('No hay un hogar seleccionado', 'error');
+    return;
+  }
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  // Buscar todos los eventos futuros
+  db.collection('events')
+    .where('homeId', '==', homeId)
+    .where('startDate', '>=', today)
+    .orderBy('startDate', 'asc')
+    .get()
+    .then((snapshot) => {
+      if (snapshot.empty) {
+        showNotification('No hay eventos próximos', 'info');
+        return;
+      }
+      
+      // Crear contenido del modal
+      const modalContent = document.createElement('div');
+      modalContent.className = 'modal-content all-events-modal';
+      
+      // Agrupar eventos por mes
+      const eventsByMonth = {};
+      
+      snapshot.forEach((doc) => {
+        const event = doc.data();
+        const eventId = doc.id;
+        const startDate = new Date(event.startDate.seconds * 1000);
+        
+        // Clave para agrupar: año-mes
+        const monthKey = `${startDate.getFullYear()}-${startDate.getMonth()}`;
+        
+        if (!eventsByMonth[monthKey]) {
+          eventsByMonth[monthKey] = {
+            monthName: getMonthName(startDate.getMonth()),
+            year: startDate.getFullYear(),
+            events: []
+          };
+        }
+        
+        eventsByMonth[monthKey].events.push({
+          id: eventId,
+          title: event.title,
+          date: startDate,
+          allDay: event.allDay,
+          category: event.category
+        });
+      });
+      
+      // Generar HTML para el modal
+      let modalHTML = `
+        <button class="modal-close" id="closeAllEventsModal">&times;</button>
+        <h2 class="modal-title">Todos los Eventos</h2>
+      `;
+      
+      // Ordenar las claves de meses cronológicamente
+      const sortedMonthKeys = Object.keys(eventsByMonth).sort();
+      
+      sortedMonthKeys.forEach(monthKey => {
+        const monthData = eventsByMonth[monthKey];
+        
+        modalHTML += `
+          <div class="month-section">
+            <h3 class="month-title">${monthData.monthName} ${monthData.year}</h3>
+            <div class="month-events">
+        `;
+        
+        monthData.events.forEach(event => {
+          const day = event.date.getDate();
+          let timeStr = event.allDay ? "Todo el día" : 
+                       `${event.date.getHours().toString().padStart(2, '0')}:${event.date.getMinutes().toString().padStart(2, '0')}`;
+          
+          modalHTML += `
+            <div class="event-list-item" data-id="${event.id}">
+              <div class="event-date-badge">
+                <div class="event-day">${day}</div>
+                <div class="event-month">${getMonthShortName(event.date.getMonth())}</div>
+              </div>
+              <div class="event-details">
+                <div class="event-title">${event.title}</div>
+                <div class="event-time">${timeStr}</div>
+              </div>
+            </div>
+          `;
+        });
+        
+        modalHTML += `
+            </div>
+          </div>
+        `;
+      });
+      
+      modalContent.innerHTML = modalHTML;
+      
+      // Crear y mostrar el modal
+      const modal = document.createElement('div');
+      modal.className = 'modal-overlay';
+      modal.id = 'allEventsModal';
+      modal.style.display = 'flex';
+      modal.appendChild(modalContent);
+      document.body.appendChild(modal);
+      
+      // Añadir event listeners
+      const closeBtn = modal.querySelector('#closeAllEventsModal');
+      closeBtn.addEventListener('click', () => {
+        document.body.removeChild(modal);
+      });
+      
+      // Click fuera del modal para cerrar
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          document.body.removeChild(modal);
+        }
+      });
+      
+      // Añadir eventos click para ver detalles
+      modal.querySelectorAll('.event-list-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const eventId = item.dataset.id;
+          document.body.removeChild(modal);
+          showEventDetails(eventId);
+        });
+      });
+    })
+    .catch((error) => {
+      console.error("Error al cargar todos los eventos:", error);
+      showNotification('Error al cargar eventos', 'error');
+    });
+}
+
+// Función auxiliar para obtener nombre completo del mes
+function getMonthName(monthIndex) {
+  const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+  return months[monthIndex];
+}
   
   // Obtener color según categoría
   function getCategoryColor(category) {

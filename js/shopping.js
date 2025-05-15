@@ -1,18 +1,20 @@
 // Funciones para la lista de compra
-
 document.addEventListener('DOMContentLoaded', function() {
   // Referencias a elementos DOM
   const newItemInput = document.getElementById('newItemInput');
-  const categorySelect = document.getElementById('categorySelect');
+  const supermarketSelect = document.getElementById('supermarketSelect'); // Cambiado de categorySelect
   const addItemBtn = document.getElementById('addItemBtn');
   const shoppingList = document.getElementById('shoppingList');
-  const categoryFilters = document.querySelectorAll('.kawaii-filter');
+  const supermarketFilters = document.querySelectorAll('.kawaii-filter'); // Cambiado de categoryFilters
   
   // Estado para el filtro actual
-  let currentCategory = 'all';
+  let currentSupermarket = 'all';
   
   // Verificar autenticación
   checkAuth().then(user => {
+    // Cargar supermercados del usuario
+    loadUserSupermarkets();
+    
     // Cargar lista de compra inicial
     loadShoppingList('all');
     
@@ -21,6 +23,70 @@ document.addEventListener('DOMContentLoaded', function() {
   }).catch(error => {
     console.error("Error de autenticación:", error);
   });
+  
+  // Cargar los supermercados del usuario para el selector y los filtros
+  function loadUserSupermarkets() {
+    const homeId = getCurrentHome();
+    if (!homeId) {
+      return;
+    }
+    
+    // Limpiar los selectores existentes
+    supermarketSelect.innerHTML = '<option value="other">Otro</option>';
+    
+    // Contenedor de filtros
+    const filtersContainer = document.querySelector('.category-filters');
+    if (filtersContainer) {
+      // Mantener solo el filtro "Todos"
+      filtersContainer.innerHTML = `
+        <button class="kawaii-filter active" data-supermarket="all">Todos</button>
+      `;
+    }
+    
+    // Buscar los supermercados guardados
+    db.collection('supermarkets')
+      .where('homeId', '==', homeId)
+      .get()
+      .then((snapshot) => {
+        if (snapshot.empty) {
+          return;
+        }
+        
+        snapshot.forEach((doc) => {
+          const supermarket = doc.data();
+          
+          // Añadir al selector
+          const option = document.createElement('option');
+          option.value = doc.id;
+          option.textContent = supermarket.name;
+          supermarketSelect.appendChild(option);
+          
+          // Añadir al filtro
+          if (filtersContainer) {
+            const filterButton = document.createElement('button');
+            filterButton.className = 'kawaii-filter';
+            filterButton.dataset.supermarket = doc.id;
+            filterButton.textContent = supermarket.name;
+            
+            // Añadir evento click
+            filterButton.addEventListener('click', () => {
+              // Actualizar UI
+              document.querySelectorAll('.kawaii-filter').forEach(f => f.classList.remove('active'));
+              filterButton.classList.add('active');
+              
+              // Actualizar filtro y cargar items
+              currentSupermarket = doc.id;
+              loadShoppingList(currentSupermarket);
+            });
+            
+            filtersContainer.appendChild(filterButton);
+          }
+        });
+      })
+      .catch((error) => {
+        console.error("Error al cargar supermercados:", error);
+      });
+  }
   
   function setupEventListeners() {
     // Añadir nuevo item
@@ -33,22 +99,20 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     
-    // Filtros de categoría
-    categoryFilters.forEach(filter => {
-      filter.addEventListener('click', () => {
-        // Actualizar UI
-        categoryFilters.forEach(f => f.classList.remove('active'));
-        filter.classList.add('active');
-        
-        // Actualizar filtro y cargar items
-        currentCategory = filter.dataset.category;
-        loadShoppingList(currentCategory);
-      });
+    // El filtro "Todos" ya tiene el evento por defecto
+    document.querySelector('.kawaii-filter[data-supermarket="all"]').addEventListener('click', () => {
+      // Actualizar UI
+      document.querySelectorAll('.kawaii-filter').forEach(f => f.classList.remove('active'));
+      document.querySelector('.kawaii-filter[data-supermarket="all"]').classList.add('active');
+      
+      // Actualizar filtro y cargar items
+      currentSupermarket = 'all';
+      loadShoppingList(currentSupermarket);
     });
   }
   
   // Cargar lista de compra según filtro
-  function loadShoppingList(category) {
+  function loadShoppingList(supermarket) {
     // Mostrar loader
     shoppingList.innerHTML = '<div class="loader"></div>';
     
@@ -62,8 +126,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let query = db.collection('shoppingItems').where('homeId', '==', homeId);
     
     // Aplicar filtro si no es 'all'
-    if (category !== 'all') {
-      query = query.where('category', '==', category);
+    if (supermarket !== 'all') {
+      query = query.where('supermarketId', '==', supermarket);
     }
     
     // Ejecutar query
@@ -80,7 +144,6 @@ document.addEventListener('DOMContentLoaded', function() {
         snapshot.forEach((doc) => {
           const item = doc.data();
           const itemId = doc.id;
-          const categoryIcon = getCategoryIcon(item.category);
           
           itemsHTML += `
             <div class="shopping-item ${item.purchased ? 'purchased' : ''}" data-id="${itemId}">
@@ -88,8 +151,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 <input type="checkbox" ${item.purchased ? 'checked' : ''}>
                 <span class="checkmark"></span>
               </div>
-              <div class="item-category">${categoryIcon}</div>
               <div class="item-name">${item.name}</div>
+              <div class="item-supermarket">${item.supermarketName || 'Otro'}</div>
               <div class="item-actions">
                 <button class="delete-btn">🗑️</button>
               </div>
@@ -135,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Añadir nuevo item a la lista
   function addNewItem() {
     const itemName = newItemInput.value.trim();
-    const category = categorySelect.value;
+    const supermarketId = supermarketSelect.value;
     
     if (!itemName) {
       showNotification('Por favor, introduce el nombre del producto', 'error');
@@ -154,10 +217,17 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
     
+    // Obtener el nombre del supermercado seleccionado
+    let supermarketName = 'Otro';
+    if (supermarketId !== 'other') {
+      supermarketName = supermarketSelect.options[supermarketSelect.selectedIndex].text;
+    }
+    
     // Preparar objeto de item
     const itemData = {
       name: itemName,
-      category: category,
+      supermarketId: supermarketId,
+      supermarketName: supermarketName,
       purchased: false,
       addedBy: user.uid,
       addedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -171,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function() {
         newItemInput.value = '';
         
         // Recargar lista (manteniendo el filtro actual)
-        loadShoppingList(currentCategory);
+        loadShoppingList(currentSupermarket);
         
         showNotification('Producto añadido a la lista', 'success');
       })
@@ -226,19 +296,5 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error("Error al eliminar item:", error);
         showNotification('Error al eliminar el producto', 'error');
       });
-  }
-  
-  // Función para obtener icono según categoría
-  function getCategoryIcon(category) {
-    const icons = {
-      'fruits': '🍎',
-      'dairy': '🥛',
-      'bakery': '🍞',
-      'meat': '🥩',
-      'cleaning': '🧹',
-      'other': '📦'
-    };
-    
-    return icons[category] || '📦';
   }
 });
