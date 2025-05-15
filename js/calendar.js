@@ -31,6 +31,8 @@ document.addEventListener('DOMContentLoaded', function() {
   checkAuth().then(user => {
     // Cargar miembros para el selector de participantes
     loadFamilyMembers();
+
+    loadUpcomingEventsList();
     
     // Inicializar calendario
     updateCalendarTitle();
@@ -124,36 +126,29 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // Renderizar calendario
-  function renderCalendar() {
-    // Mostrar loader
-    calendarGrid.innerHTML = '<div class="loader"></div>';
-    
-    const homeId = getCurrentHome();
-    if (!homeId) {
-      calendarGrid.innerHTML = '<p class="empty-message">No hay un hogar seleccionado</p>';
-      showNotification('No hay un hogar seleccionado. Por favor, crea o únete a un hogar primero.', 'error');
-      return;
-    }
-    
-    console.log("Cargando calendario con homeId:", homeId);
-    
-    // Cargar eventos para este mes
-    loadMonthEvents(homeId, currentYear, currentMonth)
-      .then(() => {
-        generateCalendarDays();
-      })
-      .catch(error => {
-        console.error("Error al cargar eventos:", error);
-        calendarGrid.innerHTML = '<p class="error-message">Error al cargar el calendario. Es posible que necesites crear un índice en Firebase.</p>';
-        showNotification('Error al cargar eventos. Es posible que necesites crear un índice en Firebase.', 'error');
-      });
-
-      loadMonthEvents(homeId, currentYear, currentMonth)
+function renderCalendar() {
+  // Mostrar loader
+  calendarGrid.innerHTML = '<div class="loader"></div>';
+  
+  const homeId = getCurrentHome();
+  if (!homeId) {
+    calendarGrid.innerHTML = '<p class="empty-message">No hay un hogar seleccionado</p>';
+    showNotification('No hay un hogar seleccionado. Por favor, crea o únete a un hogar primero.', 'error');
+    return;
+  }
+  
+  console.log("Cargando calendario con homeId:", homeId);
+  
+  // Cargar eventos para este mes (una sola vez)
+  loadMonthEvents(homeId, currentYear, currentMonth)
     .then(() => {
       generateCalendarDays();
       
-      // Cargar la lista de próximos eventos
-      loadUpcomingEventsList();
+      // En lugar de crear una nueva lista, actualizar la existente si ya existe
+      const existingList = document.getElementById('upcomingEventsList');
+      if (existingList) {
+        updateUpcomingEvents();
+      }
     })
     .catch(error => {
       console.error("Error al cargar eventos:", error);
@@ -161,9 +156,88 @@ document.addEventListener('DOMContentLoaded', function() {
       showNotification('Error al cargar eventos. Es posible que necesites crear un índice en Firebase.', 'error');
     });
 }
+// Función para actualizar la lista de eventos sin crear un nuevo contenedor
+function updateUpcomingEvents() {
+  const upcomingEventsList = document.getElementById('upcomingEventsList');
+  if (!upcomingEventsList) return;
   
+  // Mostrar loader
+  upcomingEventsList.innerHTML = '<div class="loader"></div>';
   
-  // Generar los días del calendario
+  const homeId = getCurrentHome();
+  if (!homeId) {
+    upcomingEventsList.innerHTML = '<p class="empty-message">No hay un hogar seleccionado</p>';
+    return;
+  }
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  // Buscar eventos a partir de hoy
+  db.collection('events')
+    .where('homeId', '==', homeId)
+    .where('startDate', '>=', today)
+    .orderBy('startDate', 'asc')
+    .limit(5) // Limitar a 5 eventos
+    .get()
+    .then((snapshot) => {
+      if (snapshot.empty) {
+        upcomingEventsList.innerHTML = '<p class="empty-message">No hay eventos próximos</p>';
+        return;
+      }
+      
+      let eventsHTML = '';
+      
+      snapshot.forEach((doc) => {
+        const event = doc.data();
+        const eventId = doc.id;
+        
+        // Formatear fecha
+        const startDate = new Date(event.startDate.seconds * 1000);
+        const day = startDate.getDate();
+        const month = getMonthShortName(startDate.getMonth());
+        
+        // Formatear hora
+        let timeStr = "";
+        if (!event.allDay) {
+          const hours = startDate.getHours().toString().padStart(2, '0');
+          const minutes = startDate.getMinutes().toString().padStart(2, '0');
+          timeStr = `${hours}:${minutes}`;
+        } else {
+          timeStr = "Todo el día";
+        }
+        
+        eventsHTML += `
+          <div class="event-list-item" data-id="${eventId}">
+            <div class="event-date-badge">
+              <div class="event-day">${day}</div>
+              <div class="event-month">${month}</div>
+            </div>
+            <div class="event-details">
+              <div class="event-title">${event.title}</div>
+              <div class="event-time">${timeStr}</div>
+            </div>
+          </div>
+        `;
+      });
+      
+      upcomingEventsList.innerHTML = eventsHTML;
+      
+      // Añadir eventos click para ver detalles
+      document.querySelectorAll('.event-list-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const eventId = item.dataset.id;
+          showEventDetails(eventId);
+        });
+      });
+    })
+    .catch((error) => {
+      console.error("Error al cargar próximos eventos:", error);
+      upcomingEventsList.innerHTML = '<p class="error-message">Error al cargar eventos</p>';
+    });
+}
+
+  
   // Generar los días del calendario
 function generateCalendarDays() {
   calendarGrid.innerHTML = '';
