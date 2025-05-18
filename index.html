@@ -9,6 +9,19 @@
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/kawaii-theme.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <style>
+  .activity-item {
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .activity-item:hover {
+    background-color: var(--light-peach);
+    transform: translateX(5px);
+  }
+</style>
+
 </head>
 <body>
   <header>
@@ -63,6 +76,12 @@
       <!-- Se rellena con JavaScript -->
     </div>
     
+<div class="card weather-card">
+    <div class="card-content" id="weatherCard">
+      <div class="loader"></div>
+    </div>
+  </div>
+
     <div class="dashboard-grid">
       <div class="card">
         <div class="card-title">
@@ -140,99 +159,115 @@
         loadShoppingList();
         loadUpcomingEvents();
         loadRecentActivity();
+        checkUpcomingEvents();
+        loadWeather();
       }).catch(error => {
         console.error("Error de autenticación:", error);
       });
       
       // Cargar tareas pendientes
       function loadPendingTasks() {
-        const pendingTasksCard = document.getElementById('pendingTasksCard');
-        const homeId = getCurrentHome();
-        
-        if (!homeId) {
-          pendingTasksCard.innerHTML = '<p class="empty-message">No hay un hogar seleccionado</p>';
-          return;
-        }
-        
-        db.collection('tasks')
-          .where('homeId', '==', homeId)
-          .where('status', '==', 'pending')
-          .orderBy('dueDate', 'asc')
-          .limit(3)
-          .get()
-          .then((snapshot) => {
-            if (snapshot.empty) {
-              pendingTasksCard.innerHTML = '<p class="empty-message">No hay tareas pendientes. ¡Todo en orden!</p>';
-              return;
-            }
-            
-            let tasksHTML = '<ul class="dashboard-list">';
-            
-            snapshot.forEach((doc) => {
-              const task = doc.data();
-              const dueDate = task.dueDate ? new Date(task.dueDate.seconds * 1000) : null;
-              const dueDateStr = dueDate ? dueDate.toLocaleDateString() : 'Sin fecha';
-              
-              tasksHTML += `
-                <li class="dashboard-item">
-                  <div class="dashboard-item-title">${task.title}</div>
-                  <div class="dashboard-item-meta">Fecha límite: ${dueDateStr}</div>
-                </li>
-              `;
-            });
-            
-            tasksHTML += '</ul>';
-            pendingTasksCard.innerHTML = tasksHTML;
-          })
-          .catch((error) => {
-            console.error("Error al cargar tareas:", error);
-            pendingTasksCard.innerHTML = '<p class="error-message">Error al cargar tareas</p>';
-          });
+  const pendingTasksCard = document.getElementById('pendingTasksCard');
+  const homeId = getCurrentHome();
+  
+  if (!homeId) {
+    pendingTasksCard.innerHTML = '<p class="empty-message">No hay un hogar seleccionado</p>';
+    return;
+  }
+  
+  db.collection('tasks')
+    .where('homeId', '==', homeId)
+    .where('status', '==', 'pending')
+    .orderBy('dueDate', 'asc')
+    .limit(3)
+    .get()
+    .then((snapshot) => {
+      if (snapshot.empty) {
+        pendingTasksCard.innerHTML = '<p class="empty-message">No hay tareas pendientes. ¡Todo en orden!</p>';
+        return;
       }
+      
+      let tasksHTML = '<ul class="dashboard-list">';
+      
+      snapshot.forEach((doc) => {
+        const task = doc.data();
+        const dueDate = task.dueDate ? new Date(task.dueDate.seconds * 1000) : null;
+        const dueDateStr = dueDate ? dueDate.toLocaleDateString() : 'Sin fecha';
+        
+        tasksHTML += `
+          <li class="dashboard-item activity-item" data-url="tasks.html">
+            <div class="dashboard-item-title">${task.title}</div>
+            <div class="dashboard-item-meta">Fecha límite: ${dueDateStr}</div>
+          </li>
+        `;
+      });
+      
+      tasksHTML += '</ul>';
+      pendingTasksCard.innerHTML = tasksHTML;
+      
+      // Agregar event listeners a los elementos de tarea
+      document.querySelectorAll('#pendingTasksCard .activity-item').forEach(item => {
+        item.addEventListener('click', () => {
+          window.location.href = item.dataset.url;
+        });
+      });
+    })
+    .catch((error) => {
+      console.error("Error al cargar tareas:", error);
+      pendingTasksCard.innerHTML = '<p class="error-message">Error al cargar tareas</p>';
+    });
+}
       
       // Cargar lista de compra
       function loadShoppingList() {
-        const shoppingListCard = document.getElementById('shoppingListCard');
-        const homeId = getCurrentHome();
-        
-        if (!homeId) {
-          shoppingListCard.innerHTML = '<p class="empty-message">No hay un hogar seleccionado</p>';
-          return;
-        }
-        
-        db.collection('shoppingItems')
-          .where('homeId', '==', homeId)
-          .where('purchased', '==', false)
-          .limit(3)
-          .get()
-          .then((snapshot) => {
-            if (snapshot.empty) {
-              shoppingListCard.innerHTML = '<p class="empty-message">¡La lista de compra está vacía!</p>';
-              return;
-            }
-            
-            let itemsHTML = '<ul class="dashboard-list">';
-            
-            snapshot.forEach((doc) => {
-              const item = doc.data();
-              const categoryIcon = getCategoryIcon(item.category);
-              
-              itemsHTML += `
-                <li class="dashboard-item">
-                  <div class="dashboard-item-icon">${categoryIcon}</div>
-                  <div class="dashboard-item-title">${item.name}</div>
-                </li>
-              `;
-            });
-            
-            itemsHTML += '</ul>';
-            shoppingListCard.innerHTML = itemsHTML;
-          })
-          .catch((error) => {
-            console.error("Error al cargar lista de compra:", error);
-            shoppingListCard.innerHTML = '<p class="error-message">Error al cargar la lista</p>';
-          });
+  const shoppingListCard = document.getElementById('shoppingListCard');
+  const homeId = getCurrentHome();
+  
+  if (!homeId) {
+    shoppingListCard.innerHTML = '<p class="empty-message">No hay un hogar seleccionado</p>';
+    return;
+  }
+  
+  db.collection('shoppingItems')
+    .where('homeId', '==', homeId)
+    .where('purchased', '==', false)
+    .limit(3)
+    .get()
+    .then((snapshot) => {
+      if (snapshot.empty) {
+        shoppingListCard.innerHTML = '<p class="empty-message">¡La lista de compra está vacía!</p>';
+        return;
       }
+      
+      let itemsHTML = '<ul class="dashboard-list">';
+      
+      snapshot.forEach((doc) => {
+        const item = doc.data();
+        const categoryIcon = getCategoryIcon(item.category);
+        
+        itemsHTML += `
+          <li class="dashboard-item activity-item" data-url="shopping.html">
+            <div class="dashboard-item-icon">${categoryIcon}</div>
+            <div class="dashboard-item-title">${item.name}</div>
+          </li>
+        `;
+      });
+      
+      itemsHTML += '</ul>';
+      shoppingListCard.innerHTML = itemsHTML;
+      
+      // Agregar event listeners a los elementos de compra
+      document.querySelectorAll('#shoppingListCard .activity-item').forEach(item => {
+        item.addEventListener('click', () => {
+          window.location.href = item.dataset.url;
+        });
+      });
+    })
+    .catch((error) => {
+      console.error("Error al cargar lista de compra:", error);
+      shoppingListCard.innerHTML = '<p class="error-message">Error al cargar la lista</p>';
+    });
+}
       
       // Cargar próximos eventos (con mejor visualización)
 function loadUpcomingEvents() {
@@ -272,7 +307,7 @@ function loadUpcomingEvents() {
         const formattedDate = `${day} ${month} ${year}`;
         
         eventsHTML += `
-          <li class="event-item">
+          <li class="event-item activity-item" data-url="calendar.html">
             <div class="event-date">
               <div class="event-day">${day}</div>
               <div class="event-month">${month}</div>
@@ -287,16 +322,106 @@ function loadUpcomingEvents() {
       
       eventsHTML += '</ul>';
       upcomingEventsCard.innerHTML = eventsHTML;
+      
+      // Agregar event listeners a los eventos
+      document.querySelectorAll('#upcomingEventsCard .activity-item').forEach(item => {
+        item.addEventListener('click', () => {
+          window.location.href = item.dataset.url;
+        });
+      });
     })
     .catch((error) => {
       console.error("Error al cargar eventos:", error);
       upcomingEventsCard.innerHTML = '<p class="error-message">Error al cargar eventos</p>';
     });
 }
+
+
+// Comprobar eventos próximos y mostrar notificaciones
+function checkUpcomingEvents() {
+  const homeId = getCurrentHome();
+  if (!homeId) return;
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
+  const endOfTomorrow = new Date(tomorrow);
+  endOfTomorrow.setHours(23, 59, 59, 999);
+  
+  // Buscar eventos para hoy y mañana
+  db.collection('events')
+    .where('homeId', '==', homeId)
+    .where('startDate', '>=', today)
+    .where('startDate', '<=', endOfTomorrow)
+    .get()
+    .then((snapshot) => {
+      if (snapshot.empty) return;
       
-      // Cargar actividad reciente
-      // Cargar actividad reciente (versión mejorada con datos reales)
-// Cargar actividad reciente (versión mejorada con nombres correctos)
+      // Agrupar eventos por día
+      const todayEvents = [];
+      const tomorrowEvents = [];
+      
+      snapshot.forEach((doc) => {
+        const event = doc.data();
+        const startDate = new Date(event.startDate.seconds * 1000);
+        
+        // Comparar solo las fechas (ignorando la hora)
+        const eventDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+        const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        
+        if (eventDate.getTime() === todayDate.getTime()) {
+          todayEvents.push(event);
+        } else {
+          tomorrowEvents.push(event);
+        }
+      });
+      
+      // Función para mostrar notificaciones con un retraso entre ellas
+      const showEventNotifications = () => {
+        // Mostrar notificaciones para eventos de hoy
+        if (todayEvents.length > 0) {
+          const eventNames = todayEvents.map(e => e.title).join(', ');
+          const message = todayEvents.length === 1 
+            ? `📅 Tienes un evento hoy: ${eventNames}` 
+            : `📅 Tienes ${todayEvents.length} eventos hoy: ${eventNames}`;
+          
+          showNotification(message, 'info');
+          
+          // Mostrar notificaciones para eventos de mañana después de un retraso
+          setTimeout(() => {
+            if (tomorrowEvents.length > 0) {
+              const eventNames = tomorrowEvents.map(e => e.title).join(', ');
+              const message = tomorrowEvents.length === 1 
+                ? `📆 Tienes un evento mañana: ${eventNames}` 
+                : `📆 Tienes ${tomorrowEvents.length} eventos mañana: ${eventNames}`;
+              
+              showNotification(message, 'info');
+            }
+          }, 5500); // Esperar 5.5 segundos para mostrar la segunda notificación
+        } else if (tomorrowEvents.length > 0) {
+          // Si no hay eventos hoy, mostrar solo los de mañana
+          const eventNames = tomorrowEvents.map(e => e.title).join(', ');
+          const message = tomorrowEvents.length === 1 
+            ? `📆 Tienes un evento mañana: ${eventNames}` 
+            : `📆 Tienes ${tomorrowEvents.length} eventos mañana: ${eventNames}`;
+          
+          showNotification(message, 'info');
+        }
+      };
+      
+      // Retrasar un poco las notificaciones de eventos para que no se solapen con otras
+      setTimeout(showEventNotifications, 1000);
+    })
+    .catch((error) => {
+      console.error("Error al comprobar eventos próximos:", error);
+    });
+}
+      
+      // Cargar actividad recient
+
 function loadRecentActivity() {
   const recentActivityCard = document.getElementById('recentActivityCard');
   const homeId = getCurrentHome();
@@ -367,7 +492,8 @@ function loadRecentActivity() {
                 action: 'creó la tarea',
                 subject: task.title,
                 timestamp: timestamp,
-                timeAgo: timeAgo
+                timeAgo: timeAgo,
+                itemId: doc.id
               });
               
               // Si la tarea está completada
@@ -387,7 +513,8 @@ function loadRecentActivity() {
                   action: 'completó la tarea',
                   subject: task.title,
                   timestamp: completedTimestamp,
-                  timeAgo: completedTimeAgo
+                  timeAgo: completedTimeAgo,
+                  itemId: doc.id
                 });
               }
             });
@@ -452,7 +579,8 @@ function loadRecentActivity() {
                 action: 'añadió a la lista de compra',
                 subject: item.name,
                 timestamp: timestamp,
-                timeAgo: timeAgo
+                timeAgo: timeAgo,
+                itemId: doc.id
               });
             });
           }),
@@ -483,7 +611,8 @@ function loadRecentActivity() {
                 action: 'subió el documento',
                 subject: document.title,
                 timestamp: timestamp,
-                timeAgo: timeAgo
+                timeAgo: timeAgo,
+                itemId: doc.id
               });
             });
           }),
@@ -514,7 +643,8 @@ function loadRecentActivity() {
                 action: 'creó el evento',
                 subject: event.title,
                 timestamp: timestamp,
-                timeAgo: timeAgo
+                timeAgo: timeAgo,
+                itemId: doc.id
               });
             });
           })
@@ -537,8 +667,30 @@ function loadRecentActivity() {
       allActivities.forEach(activity => {
         const icon = getActivityIcon(activity.type);
         
+        // Determinar la URL destino según el tipo de actividad
+        let targetUrl = '';
+        
+        switch(activity.type) {
+          case 'task_created':
+          case 'task_completed':
+            targetUrl = 'tasks.html';
+            break;
+          case 'shopping':
+            targetUrl = 'shopping.html';
+            break;
+          case 'chat':
+            targetUrl = 'chat.html';
+            break;
+          case 'event':
+            targetUrl = 'calendar.html';
+            break;
+          case 'document':
+            targetUrl = 'documents.html';
+            break;
+        }
+        
         activityHTML += `
-          <li class="dashboard-item">
+          <li class="dashboard-item activity-item" data-url="${targetUrl}">
             <div class="dashboard-item-icon">${icon}</div>
             <div class="dashboard-item-content">
               <strong>${activity.user}</strong> ${activity.action} <span class="activity-subject">${activity.subject}</span>
@@ -550,11 +702,265 @@ function loadRecentActivity() {
       
       activityHTML += '</ul>';
       recentActivityCard.innerHTML = activityHTML;
+      
+      // Agregar event listeners a los elementos de actividad
+      document.querySelectorAll('.activity-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const url = item.dataset.url;
+          if (url) {
+            window.location.href = url;
+          }
+        });
+      });
     })
     .catch(error => {
       console.error("Error al cargar actividad reciente:", error);
       recentActivityCard.innerHTML = '<p class="error-message">Error al cargar la actividad reciente</p>';
     });
+}
+
+// Función para cargar el clima
+function loadWeather() {
+  const weatherCard = document.getElementById('weatherCard');
+  
+  // Intentar obtener la ubicación del usuario
+  if (navigator.geolocation) {
+    weatherCard.innerHTML = '<div class="loader"></div><p class="text-center">Obteniendo ubicación...</p>';
+    
+    navigator.geolocation.getCurrentPosition(
+      // Éxito al obtener la posición
+      position => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        
+        // Llamar a WeatherAPI con las coordenadas
+        fetchWeatherData(`${lat},${lon}`);
+      },
+      // Error al obtener la posición
+      error => {
+        console.error("Error al obtener la ubicación:", error);
+        weatherCard.innerHTML = `
+          <p class="text-center">No se pudo obtener tu ubicación. 
+          Por favor, permite el acceso a la ubicación o introduce tu ciudad manualmente.</p>
+          <div class="form-group mt-20">
+            <input type="text" id="cityInput" placeholder="Introduce tu ciudad">
+            <button class="kawaii-btn mt-10" id="searchCityBtn">Buscar</button>
+          </div>
+        `;
+        
+        // Evento para buscar por ciudad
+        document.getElementById('searchCityBtn').addEventListener('click', () => {
+          const city = document.getElementById('cityInput').value.trim();
+          if (city) {
+            fetchWeatherData(city);
+          }
+        });
+      }
+    );
+  } else {
+    // El navegador no soporta geolocalización
+    weatherCard.innerHTML = `
+      <p class="text-center">Tu navegador no soporta geolocalización. 
+      Por favor, introduce tu ciudad manualmente.</p>
+      <div class="form-group mt-20">
+        <input type="text" id="cityInput" placeholder="Introduce tu ciudad">
+        <button class="kawaii-btn mt-10" id="searchCityBtn">Buscar</button>
+      </div>
+    `;
+    
+    // Evento para buscar por ciudad
+    document.getElementById('searchCityBtn').addEventListener('click', () => {
+      const city = document.getElementById('cityInput').value.trim();
+      if (city) {
+        fetchWeatherData(city);
+      }
+    });
+  }
+}
+
+// Función para obtener el clima (con WeatherAPI)
+function fetchWeatherData(query) {
+  const weatherCard = document.getElementById('weatherCard');
+  const apiKey = 'ad2b0d9127474acbb1d202344251505'; // Tu API Key de WeatherAPI
+  
+  // URL para la API (incluye clima actual y pronóstico de 3 días)
+  const weatherUrl = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${encodeURIComponent(query)}&days=5&aqi=no&alerts=no&lang=es`;
+  
+  // Mostrar loader mientras se carga
+  weatherCard.innerHTML = '<div class="loader"></div>';
+  
+  fetch(weatherUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Error al obtener datos del clima');
+      }
+      return response.json();
+    })
+    .then(data => {
+      // Procesar los datos y mostrar el clima
+      displayWeatherFromWeatherAPI(data);
+    })
+    .catch(error => {
+      console.error("Error al obtener el clima:", error);
+      weatherCard.innerHTML = `
+        <p class="error-message">Error al cargar datos del clima: ${error.message}</p>
+        <div class="form-group mt-20">
+          <input type="text" id="cityInput" placeholder="Introduce tu ciudad">
+          <button class="kawaii-btn mt-10" id="searchCityBtn">Buscar</button>
+        </div>
+      `;
+      
+      // Evento para buscar por ciudad
+      document.getElementById('searchCityBtn').addEventListener('click', () => {
+        const city = document.getElementById('cityInput').value.trim();
+        if (city) {
+          fetchWeatherData(city);
+        }
+      });
+    });
+}
+
+// Función para mostrar el clima desde WeatherAPI
+// Función para mostrar el clima desde WeatherAPI (versión compacta)
+function displayWeatherFromWeatherAPI(data) {
+  const weatherCard = document.getElementById('weatherCard');
+  
+  // Datos del clima actual
+  const currentWeather = data.current;
+  const location = data.location;
+  
+  // Extraer datos relevantes
+  const temperature = Math.round(currentWeather.temp_c);
+  const description = currentWeather.condition.text;
+  const weatherIcon = getWeatherEmoji(currentWeather.condition.code);
+  const humidity = currentWeather.humidity;
+  const windSpeed = Math.round(currentWeather.wind_kph);
+  const rainProbability = data.forecast.forecastday[0].day.daily_chance_of_rain;
+  const cityName = location.name;
+  
+  // Crear el HTML para el pronóstico
+  let forecastHTML = '';
+  
+  // Obtener pronóstico para los próximos días (omitir el día actual)
+  const forecasts = data.forecast.forecastday.slice(1);
+  
+  forecasts.forEach(forecast => {
+    const date = new Date(forecast.date);
+    const day = date.toLocaleDateString('es-ES', { weekday: 'short' });
+    const icon = getWeatherEmojiFromCode(forecast.day.condition.code);
+    const maxTemp = Math.round(forecast.day.maxtemp_c);
+    const minTemp = Math.round(forecast.day.mintemp_c);
+    
+    forecastHTML += `
+      <div class="forecast-day">
+        <div class="forecast-date">${day}</div>
+        <div class="forecast-icon">${icon}</div>
+        <div class="forecast-temp">
+          <span class="forecast-temp-max">${maxTemp}°</span>
+          <span class="forecast-temp-min">${minTemp}°</span>
+        </div>
+      </div>
+    `;
+  });
+  
+  // Crear el widget compacto
+  weatherCard.innerHTML = `
+    <div class="weather-widget">
+      <div class="weather-current">
+        <div class="weather-icon">${weatherIcon}</div>
+        <div class="weather-info">
+          <div class="weather-temp">${temperature}°C</div>
+          <div class="weather-description">${description}</div>
+        </div>
+      </div>
+      
+      <div class="weather-details">
+        <div class="weather-detail-item">
+          <div class="weather-detail-label">Humedad</div>
+          <div class="weather-detail-value">${humidity}%</div>
+        </div>
+        <div class="weather-detail-item">
+          <div class="weather-detail-label">Viento</div>
+          <div class="weather-detail-value">${windSpeed} km/h</div>
+        </div>
+        <div class="weather-detail-item">
+          <div class="weather-detail-label">Lluvia</div>
+          <div class="weather-detail-value">${rainProbability}%</div>
+        </div>
+      </div>
+      
+      <div class="weather-forecast">
+        ${forecastHTML}
+      </div>
+      
+      <div class="weather-location">
+        <span class="weather-location-icon">📍</span> ${cityName}
+      </div>
+    </div>
+  `;
+}
+
+// Función para convertir códigos de condición de WeatherAPI a emojis
+function getWeatherEmojiFromCode(conditionCode) {
+  // Mapeo de códigos de condición de WeatherAPI a emojis
+  // Basado en la documentación: https://www.weatherapi.com/docs/weather_conditions.json
+  const codeMap = {
+    1000: '☀️',  // Soleado / Despejado
+    1003: '🌤️',  // Parcialmente nublado
+    1006: '⛅',   // Nublado
+    1009: '☁️',   // Cubierto
+    1030: '🌫️',   // Neblina
+    1063: '🌦️',   // Lluvia intermitente
+    1066: '🌨️',   // Nieve intermitente
+    1069: '🌧️',   // Aguanieve
+    1072: '🌧️',   // Llovizna helada
+    1087: '⛈️',   // Truenos
+    1114: '❄️',   // Ventisca
+    1117: '❄️',   // Tormenta de nieve
+    1135: '🌫️',   // Niebla
+    1147: '🌫️',   // Niebla helada
+    1150: '🌧️',   // Llovizna ligera
+    1153: '🌧️',   // Llovizna ligera
+    1168: '🌧️',   // Llovizna helada
+    1171: '🌧️',   // Llovizna fuerte helada
+    1180: '🌧️',   // Lluvia ligera
+    1183: '🌧️',   // Lluvia ligera
+    1186: '🌧️',   // Lluvia moderada
+    1189: '🌧️',   // Lluvia moderada
+    1192: '🌧️',   // Lluvia fuerte
+    1195: '🌧️',   // Lluvia fuerte
+    1198: '🌧️',   // Lluvia ligera helada
+    1201: '🌧️',   // Lluvia moderada o fuerte helada
+    1204: '🌨️',   // Aguanieve ligera
+    1207: '🌨️',   // Aguanieve moderada o fuerte
+    1210: '🌨️',   // Nieve ligera
+    1213: '🌨️',   // Nieve ligera
+    1216: '🌨️',   // Nieve moderada
+    1219: '🌨️',   // Nieve moderada
+    1222: '❄️',   // Nieve fuerte
+    1225: '❄️',   // Nieve fuerte
+    1237: '🌨️',   // Hielo
+    1240: '🌧️',   // Lluvia ligera
+    1243: '🌧️',   // Lluvia moderada o fuerte
+    1246: '🌧️',   // Lluvia torrencial
+    1249: '🌨️',   // Aguanieve ligera
+    1252: '🌨️',   // Aguanieve moderada o fuerte
+    1255: '🌨️',   // Nieve ligera
+    1258: '❄️',   // Nieve moderada o fuerte
+    1261: '🌨️',   // Granizo ligero
+    1264: '🌨️',   // Granizo moderado o fuerte
+    1273: '⛈️',   // Lluvia ligera con truenos
+    1276: '⛈️',   // Lluvia moderada o fuerte con truenos
+    1279: '⛈️',   // Nieve ligera con truenos
+    1282: '⛈️'    // Nieve moderada o fuerte con truenos
+  };
+  
+  return codeMap[conditionCode] || '🌡️';
+}
+
+// Función auxiliar para mantener compatibilidad con el código anterior
+function getWeatherEmoji(conditionCode) {
+  return getWeatherEmojiFromCode(conditionCode);
 }
 
 // Función mejorada para obtener icono según tipo de actividad
