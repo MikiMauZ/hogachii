@@ -20,250 +20,285 @@
         <span></span>
         <span></span>
       </div>
-  <!-- Logo clickable -->
-  <a href="index.html" class="logo">
-    <div class="hogachii-logo">
-      <span class="hogachii-h">H</span>
-      <span class="hogachii-text">ogachii</span>
-    </div>
-  </a>
-  
-  <ul class="menu">
-    <li><a href="index.html">Inicio</a></li>
-    <li><a href="tasks.html">Tareas</a></li>
-    <li><a href="shopping.html">Compras</a></li>
-    <li><a href="calendar.html">Calendario</a></li>
-    <li><a href="schedule.html" class="active">Horarios</a></li>
-    <li><a href="documents.html">Documentos</a></li>
-    <li><a href="chat.html">Chat</a></li>
-  </ul>
-  
-  <!-- Versión móvil del menú (más elegante) -->
-  <div class="menu-mobile" id="mobileMenu">
-    <div class="menu-mobile-logo">Hogachii</div>
-    <ul>
-      <li><a href="index.html"><span class="menu-icon">🏠</span> Inicio</a></li>
-      <li><a href="tasks.html"><span class="menu-icon">✅</span> Tareas</a></li>
-      <li><a href="shopping.html"><span class="menu-icon">🛒</span> Compras</a></li>
-      <li><a href="calendar.html"><span class="menu-icon">📅</span> Calendario</a></li>
-      <li><a href="schedule.html" class="active"><span class="menu-icon">🗓️</span> Horarios</a></li>
-      <li><a href="documents.html"><span class="menu-icon">📄</span> Documentos</a></li>
-      <li><a href="chat.html"><span class="menu-icon">💬</span> Chat</a></li>
-    </ul>
-  </div>
-  
-  <div class="user-menu" id="userMenu">
-    <!-- Se rellena con JavaScript -->
-  </div>
-</nav>
+      <!-- Logo clickable -->
+      <a href="index.html" class="logo">
+        <div class="hogachii-logo">
+          <span class="hogachii-h">H</span>
+          <span class="hogachii-text">ogachii</span>
+        </div>
+      </a>
+      
+      <ul class="menu">
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="tasks.html">Tareas</a></li>
+        <li><a href="shopping.html">Compras</a></li>
+        <li><a href="calendar.html">Calendario</a></li>
+        <li><a href="schedule.html">Horarios</a></li>
+        <li><a href="menu.html">Menú</a></li>
+        <li><a href="chat.html">Chat</a></li>
+      </ul>
+      
+      <!-- Versión móvil del menú -->
+      <div class="menu-mobile" id="mobileMenu">
+        <div class="menu-mobile-logo">Hogachii</div>
+        <ul>
+          <li><a href="index.html"><span class="menu-icon">🏠</span> Inicio</a></li>
+          <li><a href="tasks.html"><span class="menu-icon">✅</span> Tareas</a></li>
+          <li><a href="shopping.html"><span class="menu-icon">🛒</span> Compras</a></li>
+          <li><a href="calendar.html"><span class="menu-icon">📅</span> Calendario</a></li>
+          <li><a href="schedule.html"><span class="menu-icon">🗓️</span> Horarios</a></li>
+          <li><a href="menu.html"><span class="menu-icon">🍽️</span> Menú</a></li>
+          <li><a href="chat.html"><span class="menu-icon">💬</span> Chat</a></li>
+        </ul>
+      </div>
+      
+      <div class="user-menu" id="userMenu">
+        <!-- Se rellena con JavaScript -->
+      </div>
+    </nav>
   </header>
   <main>
     <h1>Tableros Semanales <span class="kawaii-icon">🗓️</span></h1>
-<div class="schedule-container" id="scheduleContainer">
-  <!-- Selector de tableros -->
-  <div class="schedule-selector">
-    <div class="selector-title">Mis tableros</div>
-    <div class="boards-list" id="boardsList">
-      <!-- Se rellena con JavaScript -->
-      <div class="loader"></div>
-    </div>
-    <button id="createBoardBtn" class="kawaii-btn">
-      <span>Crear Nuevo Tablero</span>
-    </button>
-  </div>
-  
-  <!-- Vista del tablero actual -->
-  <div class="current-board" id="currentBoard">
-    <div class="board-header">
-      <h2 id="boardTitle">Selecciona un tablero</h2>
-      <div class="board-actions">
-        <button id="editBoardBtn" class="kawaii-btn">Editar</button>
-        <div class="board-filters">
-          <button id="filterAllBtn" class="kawaii-filter active">Todos</button>
-          <button id="filterMineBtn" class="kawaii-filter">Solo míos</button>
-          <!-- Filtros adicionales se añaden con JavaScript -->
+    <div class="schedule-container" id="scheduleContainer">
+      <!-- Selector de tableros -->
+      <div class="schedule-selector">
+        <div class="selector-title">Mis tableros</div>
+        <div class="boards-list" id="boardsList">
+          <!-- Se rellena con JavaScript -->
+          <div class="loader"></div>
         </div>
-      </div>
-    </div>
-    
-    <!-- Aquí va la rejilla del tablero -->
-    <div class="schedule-view-container" id="scheduleViewContainer">
-      <p class="empty-message">Selecciona un tablero para ver su horario</p>
-    </div>
-  </div>
-</div>
-
-<!-- Modal para crear/editar tablero -->
-<div class="modal-overlay" id="boardModal" style="display: none;">
-  <div class="modal-content">
-    <button class="modal-close" id="closeBoardModal">&times;</button>
-    <h2 class="modal-title" id="boardModalTitle">Nuevo Tablero</h2>
-    
-    <form id="boardForm">
-      <input type="hidden" id="boardId" value="">
-      
-      <div class="form-group">
-        <label for="boardName">Nombre del Tablero</label>
-        <input type="text" id="boardName" required placeholder="Ej: Horario escolar, Turnos de trabajo">
+        <button id="createBoardBtn" class="kawaii-btn">
+          <span>Crear Nuevo Tablero</span>
+        </button>
       </div>
       
-      <div class="form-group">
-        <label for="boardType">Tipo de Tablero</label>
-        <select id="boardType">
-          <option value="school">Escolar</option>
-          <option value="work">Trabajo</option>
-          <option value="activities">Actividades</option>
-          <option value="custom">Personalizado</option>
-        </select>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-col">
-          <div class="form-group">
-            <label for="startHour">Hora inicio</label>
-            <select id="startHour">
-              <option value="6">6:00</option>
-              <option value="7">7:00</option>
-              <option value="8" selected>8:00</option>
-              <option value="9">9:00</option>
-              <option value="10">10:00</option>
-              <option value="11">11:00</option>
-              <option value="12">12:00</option>
-            </select>
-          </div>
+      <!-- Vista del tablero actual -->
+      <div class="current-board" id="currentBoard">
+        <div class="board-header">
+          <h2 id="boardTitle">Selecciona un horario</h2>
         </div>
-        <div class="form-col">
-          <div class="form-group">
-            <label for="endHour">Hora fin</label>
-            <select id="endHour">
-              <option value="17">17:00</option>
-              <option value="18">18:00</option>
-              <option value="19">19:00</option>
-              <option value="20" selected>20:00</option>
-              <option value="21">21:00</option>
-              <option value="22">22:00</option>
-              <option value="23">23:00</option>
-            </select>
-          </div>
+        
+        <!-- Navegación de semana mejorada -->
+        <div class="schedule-week-nav" id="weekNav" style="display: none;">
+          <button id="prevWeekBtn" class="week-nav-button">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <div class="current-week-title" id="currentWeekTitle"></div>
+          <button id="nextWeekBtn" class="week-nav-button">
+            <i class="fas fa-chevron-right"></i>
+          </button>
         </div>
-      </div>
-      
-      <div class="form-group">
-        <label for="timeSlot">Intervalo de tiempo</label>
-        <select id="timeSlot">
-          <option value="15">15 minutos</option>
-          <option value="30" selected>30 minutos</option>
-          <option value="60">1 hora</option>
-        </select>
-      </div>
-      
-      <div class="form-group">
-        <label>Miembros con acceso</label>
-        <div id="boardMembers" class="members-container">
+        
+        <!-- Mensaje vacío inicial -->
+        <div id="emptyScheduleMessage" class="empty-message">
+          <p>Selecciona un horario de la lista o crea uno nuevo para empezar.</p>
+        </div>
+        
+        <!-- Aquí va la rejilla del horario -->
+        <div id="scheduleGrid" class="schedule-grid" style="display: none;">
           <!-- Se rellena con JavaScript -->
         </div>
       </div>
-      
-      <div class="modal-actions">
-        <button type="button" id="cancelBoardBtn" class="btn-secondary">Cancelar</button>
-        <button type="submit" class="kawaii-btn">Guardar</button>
-      </div>
-    </form>
-  </div>
-</div>
+    </div>
 
-<!-- Modal para crear/editar actividad -->
-<div class="modal-overlay" id="activityModal" style="display: none;">
-  <div class="modal-content">
-    <button class="modal-close" id="closeActivityModal">&times;</button>
-    <h2 class="modal-title" id="activityModalTitle">Nueva Actividad</h2>
-    
-    <form id="activityForm">
-      <input type="hidden" id="activityId" value="">
-      
-      <div class="form-group">
-        <label for="activityTitle">Título</label>
-        <input type="text" id="activityTitle" required placeholder="Ej: Matemáticas, Reunión">
-      </div>
-      
-      <div class="form-row">
-        <div class="form-col">
+    <!-- Modal para crear/editar horario -->
+    <div class="modal-overlay" id="createScheduleModal" style="display: none;">
+      <div class="modal-content">
+        <button class="modal-close" id="closeCreateScheduleModal">&times;</button>
+        <h2 class="modal-title">Nuevo Tablero</h2>
+        
+        <form id="createScheduleForm">
           <div class="form-group">
-            <label for="activityDay">Día</label>
-            <select id="activityDay">
-              <option value="0">Lunes</option>
-              <option value="1">Martes</option>
-              <option value="2">Miércoles</option>
-              <option value="3">Jueves</option>
-              <option value="4">Viernes</option>
-              <option value="5">Sábado</option>
-              <option value="6">Domingo</option>
+            <label for="scheduleName">Nombre del Horario</label>
+            <input type="text" id="scheduleName" required placeholder="Ej: Horario escolar, Turnos de trabajo">
+          </div>
+          
+          <div class="form-group">
+            <label for="scheduleType">Tipo de Horario</label>
+            <select id="scheduleType">
+              <option value="school">Escolar</option>
+              <option value="work">Trabajo</option>
+              <option value="activities">Actividades</option>
+              <option value="custom">Personalizado</option>
             </select>
           </div>
-        </div>
-        <div class="form-col">
+          
+          <div class="form-row">
+            <div class="form-col">
+              <div class="form-group">
+                <label for="scheduleStartHour">Hora de inicio</label>
+                <select id="scheduleStartHour">
+                  <option value="5">5:00</option>
+                  <option value="6">6:00</option>
+                  <option value="7" selected>7:00</option>
+                  <option value="8">8:00</option>
+                  <option value="9">9:00</option>
+                  <option value="10">10:00</option>
+                  <option value="11">11:00</option>
+                  <option value="12">12:00</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-col">
+              <div class="form-group">
+                <label for="scheduleEndHour">Hora de fin</label>
+                <select id="scheduleEndHour">
+                  <option value="15">15:00</option>
+                  <option value="16">16:00</option>
+                  <option value="17">17:00</option>
+                  <option value="18">18:00</option>
+                  <option value="19">19:00</option>
+                  <option value="20">20:00</option>
+                  <option value="21">21:00</option>
+                  <option value="22" selected>22:00</option>
+                  <option value="23">23:00</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="scheduleTimeSlot">Intervalo de tiempo</label>
+            <select id="scheduleTimeSlot">
+              <option value="15">15 minutos</option>
+              <option value="30" selected>30 minutos</option>
+              <option value="60">1 hora</option>
+            </select>
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" id="cancelCreateScheduleBtn" class="btn-secondary">Cancelar</button>
+            <button type="submit" class="kawaii-btn">Crear Horario</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal para crear/editar actividad -->
+    <div class="modal-overlay" id="activityModal" style="display: none;">
+      <div class="modal-content">
+        <button class="modal-close" id="closeActivityModal">&times;</button>
+        <h2 class="modal-title" id="activityModalTitle">Nueva Actividad</h2>
+        
+        <form id="activityForm" class="activity-form">
+          <!-- Campos ocultos para almacenar información necesaria -->
+          <input type="hidden" id="activityDay" value="">
+          <input type="hidden" id="activityHour" value="">
+          
+          <div class="form-group">
+            <label for="activityTitle">Título</label>
+            <input type="text" id="activityTitle" required placeholder="Ej: Matemáticas, Reunión">
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col">
+              <div class="form-group">
+                <label for="activityStartHour">Hora inicio</label>
+                <select id="activityStartHour">
+                  <!-- Se rellenará dinámicamente -->
+                </select>
+              </div>
+            </div>
+            <div class="form-col">
+              <div class="form-group">
+                <label for="activityStartMinute">Minutos</label>
+                <select id="activityStartMinute">
+                  <option value="00">00</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                  <option value="20">20</option>
+                  <option value="30">30</option>
+                  <option value="40">40</option>
+                  <option value="45">45</option>
+                  <option value="50">50</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col">
+              <div class="form-group">
+                <label for="activityEndHour">Hasta (hora)</label>
+                <select id="activityEndHour">
+                  <!-- Se rellenará dinámicamente -->
+                </select>
+              </div>
+            </div>
+            <div class="form-col">
+              <div class="form-group">
+                <label for="activityEndMinute">Minutos</label>
+                <select id="activityEndMinute">
+                  <option value="00">00</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                  <option value="20">20</option>
+                  <option value="30">30</option>
+                  <option value="40">40</option>
+                  <option value="45">45</option>
+                  <option value="50">50</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="activityLocation">Ubicación (opcional)</label>
+            <input type="text" id="activityLocation" placeholder="Ej: Aula 5B, Sala de reuniones">
+          </div>
+          
           <div class="form-group">
             <label for="activityAssignee">Asignar a</label>
             <select id="activityAssignee">
+              <option value="">Sin asignar</option>
               <!-- Se rellena con JavaScript -->
             </select>
           </div>
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-col">
+          
           <div class="form-group">
-            <label for="activityStartTime">Hora inicio</label>
-            <input type="time" id="activityStartTime" required>
+            <label for="activityNotes">Notas (opcional)</label>
+            <textarea id="activityNotes" rows="3" placeholder="Detalles adicionales..."></textarea>
           </div>
-        </div>
-        <div class="form-col">
+          
+          <div class="form-group checkbox-group">
+            <label class="checkbox-container">
+              <input type="checkbox" id="activityRecurring">
+              <span class="checkmark"></span>
+              Actividad recurrente (se repite cada semana)
+            </label>
+          </div>
+          
           <div class="form-group">
-            <label for="activityEndTime">Hora fin</label>
-            <input type="time" id="activityEndTime" required>
+            <label>Color</label>
+            <div class="color-selector">
+              <div class="color-option selected" data-color="#ffaea3" style="background-color: #ff6b9d;"></div>
+              <div class="color-option" data-color="#9ddcc9" style="background-color: #2d9cdb;"></div>
+              <div class="color-option" data-color="#ffd6cf" style="background-color: #ffb0cd;"></div>
+              <div class="color-option" data-color="#a6c1ee" style="background-color: #a6c1ee;"></div>
+              <div class="color-option" data-color="#f6def6" style="background-color: #f6def6;"></div>
+              <div class="color-option" data-color="#fbe5c8" style="background-color: #fbe5c8;"></div>
+            </div>
           </div>
-        </div>
+          
+          <!-- Opciones de eliminación -->
+          <div id="deleteOptions" style="display: none;">
+            <div class="form-group checkbox-group">
+              <label class="checkbox-container">
+                <input type="checkbox" id="deleteAllHours" checked>
+                <span class="checkmark"></span>
+                Eliminar toda la actividad (todas las horas)
+              </label>
+            </div>
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" id="deleteActivityBtn" class="btn-danger" style="display: none;">Eliminar</button>
+            <button type="button" id="cancelActivityBtn" class="btn-secondary">Cancelar</button>
+            <button type="submit" class="kawaii-btn">Guardar</button>
+          </div>
+        </form>
       </div>
-      
-      <div class="form-group">
-        <label for="activityLocation">Ubicación (opcional)</label>
-        <input type="text" id="activityLocation" placeholder="Ej: Aula 5B, Sala de reuniones">
-      </div>
-      
-      <div class="form-group">
-        <label for="activityColor">Color</label>
-        <div class="color-selector" id="activityColorSelector">
-          <div class="color-option selected" data-color="#ffaea3" style="background-color: #ffaea3;"></div>
-          <div class="color-option" data-color="#9ddcc9" style="background-color: #9ddcc9;"></div>
-          <div class="color-option" data-color="#ffd6cf" style="background-color: #ffd6cf;"></div>
-          <div class="color-option" data-color="#fffcf5" style="background-color: #fffcf5;"></div>
-          <div class="color-option" data-color="#a6c1ee" style="background-color: #a6c1ee;"></div>
-          <div class="color-option" data-color="#f6def6" style="background-color: #f6def6;"></div>
-        </div>
-      </div>
-      
-      <div class="form-group checkbox-group">
-        <label class="checkbox-container">
-          <input type="checkbox" id="activityRecurring">
-          <span class="checkmark"></span>
-          Actividad recurrente (se repite cada semana)
-        </label>
-      </div>
-      
-      <div class="form-group">
-        <label for="activityNotes">Notas (opcional)</label>
-        <textarea id="activityNotes" rows="3" placeholder="Detalles adicionales..."></textarea>
-      </div>
-      
-      <div class="modal-actions">
-        <button type="button" id="deleteActivityBtn" class="btn-danger" style="display: none;">Eliminar</button>
-        <button type="button" id="cancelActivityBtn" class="btn-secondary">Cancelar</button>
-        <button type="submit" class="kawaii-btn">Guardar</button>
-      </div>
-    </form>
-  </div>
-</div>
+    </div>
   </main>
   <footer>
     <p>Hogachii &copy; 2025</p>

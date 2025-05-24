@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menú Semanal - Hogachii</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/kawaii-theme.css">
+  <link rel="stylesheet" href="css/menu-planner.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <!-- Menú hamburguesa para móviles -->
+      <div class="hamburger-menu" id="hamburgerMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      
+      <!-- Logo clickable -->
+      <a href="index.html" class="logo">
+        <div class="hogachii-logo">
+          <span class="hogachii-h">H</span>
+          <span class="hogachii-text">ogachii</span>
+        </div>
+      </a>
+      
+      <ul class="menu">
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="tasks.html">Tareas</a></li>
+        <li><a href="shopping.html">Compras</a></li>
+        <li><a href="calendar.html">Calendario</a></li>
+        <li><a href="schedule.html">Horarios</a></li>
+        <li><a href="menu.html">Menú</a></li>
+        <li><a href="chat.html">Chat</a></li>
+      </ul>
+      
+      <!-- Versión móvil del menú -->
+      <div class="menu-mobile" id="mobileMenu">
+        <div class="menu-mobile-logo">Hogachii</div>
+        <ul>
+          <li><a href="index.html"><span class="menu-icon">🏠</span> Inicio</a></li>
+          <li><a href="tasks.html"><span class="menu-icon">✅</span> Tareas</a></li>
+          <li><a href="shopping.html"><span class="menu-icon">🛒</span> Compras</a></li>
+          <li><a href="calendar.html"><span class="menu-icon">📅</span> Calendario</a></li>
+          <li><a href="schedule.html"><span class="menu-icon">🗓️</span> Horarios</a></li>
+          <li><a href="menu.html"><span class="menu-icon">🍽️</span> Menú</a></li>
+          <li><a href="chat.html"><span class="menu-icon">💬</span> Chat</a></li>
+        </ul>
+      </div>
+      
+      <div class="user-menu" id="userMenu">
+        <!-- Se rellena con JavaScript -->
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Menú Semanal <span class="kawaii-icon">🍽️</span></h1>
+    
+    <!-- Barra de herramientas superior optimizada -->
+    <div class="menu-toolbar">
+      <div class="menu-week-selector">
+        <button id="prevWeekBtn" class="arrow-btn">◀</button>
+        <h2 id="currentWeekLabel">19 may - 25 may</h2>
+        <button id="nextWeekBtn" class="arrow-btn">▶</button>
+      </div>
+      <div class="menu-actions">
+        <button id="addRecipeBtn" class="kawaii-btn">
+          <span class="kawaii-icon">📝</span> Nueva Receta
+        </button>
+        <button id="generateShoppingBtn" class="kawaii-btn">
+          <span class="kawaii-icon">🛒</span> Generar Lista de Compra
+        </button>
+      </div>
+    </div>
+    
+    <!-- Planificador semanal (primero) -->
+    <div class="weekly-planner">
+      <div class="planner-grid">
+        <div class="day-headers">
+          <div class="time-header"></div>
+          <div class="day-header">Lunes</div>
+          <div class="day-header">Martes</div>
+          <div class="day-header">Miércoles</div>
+          <div class="day-header">Jueves</div>
+          <div class="day-header">Viernes</div>
+          <div class="day-header weekend">Sábado</div>
+          <div class="day-header weekend">Domingo</div>
+        </div>
+        
+        <div id="menuGrid" class="menu-grid">
+          <!-- Se rellena con JavaScript -->
+          <div class="loader"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Sección de Mis Recetas (ahora debajo) -->
+    <div class="recipes-section">
+      <h2>Mis Recetas</h2>
+      <div class="search-container">
+        <input type="text" id="recipeSearch" placeholder="Buscar recetas...">
+      </div>
+      
+      <div class="recipe-categories">
+        <button class="kawaii-filter active" data-category="all">Todos</button>
+        <button class="kawaii-filter" data-category="main">Platos Principales</button>
+        <button class="kawaii-filter" data-category="side">Guarniciones</button>
+        <button class="kawaii-filter" data-category="dessert">Postres</button>
+        <button class="kawaii-filter" data-category="breakfast">Desayunos</button>
+      </div>
+      
+      <div id="recipesList" class="recipes-list">
+        <!-- Se rellena con JavaScript -->
+        <div class="loader"></div>
+      </div>
+      
+      <div class="pagination-controls">
+        <button id="prevPageBtn" class="arrow-btn">◀</button>
+        <span id="paginationInfo">Página 1 de 1</span>
+        <button id="nextPageBtn" class="arrow-btn">▶</button>
+      </div>
+    </div>
+    
+    <!-- Modales -->
+    <!-- Modal para Crear/Editar Receta -->
+    <div class="modal-overlay" id="recipeModal" style="display: none;">
+      <div class="modal-content">
+        <button class="modal-close" id="closeRecipeModal">&times;</button>
+        <h2 class="modal-title" id="recipeModalTitle">Nueva Receta</h2>
+        
+        <form id="recipeForm">
+          <input type="hidden" id="recipeId" value="">
+          
+          <div class="form-group">
+            <label for="recipeName">Nombre de la Receta</label>
+            <input type="text" id="recipeName" required placeholder="Ej: Lasaña de verduras">
+          </div>
+          
+          <div class="form-row">
+            <div class="form-col">
+              <div class="form-group">
+                <label for="recipeCategory">Categoría</label>
+                <select id="recipeCategory">
+                  <option value="main">Plato Principal</option>
+                  <option value="side">Guarnición</option>
+                  <option value="dessert">Postre</option>
+                  <option value="breakfast">Desayuno</option>
+                  <option value="snack">Aperitivo</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-col">
+              <div class="form-group">
+                <label for="recipePrepTime">Tiempo (min)</label>
+                <input type="number" id="recipePrepTime" min="5" step="5" value="30">
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="recipeDescription">Descripción breve</label>
+            <textarea id="recipeDescription" rows="2" placeholder="Breve descripción de la receta..."></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label>Ingredientes</label>
+            <div id="ingredientsList">
+              <div class="ingredient-row">
+                <input type="text" class="ingredient-name" placeholder="Ingrediente">
+                <input type="text" class="ingredient-amount" placeholder="Cantidad">
+                <button type="button" class="remove-ingredient-btn">🗑️</button>
+              </div>
+            </div>
+            <button type="button" id="addIngredientBtn" class="kawaii-btn small-btn mt-10">+ Añadir ingrediente</button>
+          </div>
+          
+          <div class="form-group">
+            <label for="recipeInstructions">Instrucciones</label>
+            <textarea id="recipeInstructions" rows="5" placeholder="Pasos para preparar la receta..."></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label>Etiquetas</label>
+            <div class="tags-container" id="recipeTags">
+              <div class="tag-option" data-tag="vegetarian">Vegetariano</div>
+              <div class="tag-option" data-tag="vegan">Vegano</div>
+              <div class="tag-option" data-tag="gluten-free">Sin Gluten</div>
+              <div class="tag-option" data-tag="quick">Rápido</div>
+              <div class="tag-option" data-tag="easy">Fácil</div>
+              <div class="tag-option" data-tag="healthy">Saludable</div>
+            </div>
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" id="deleteRecipeBtn" class="btn-danger" style="display: none;">Eliminar</button>
+            <button type="button" id="cancelRecipeBtn" class="btn-secondary">Cancelar</button>
+            <button type="submit" class="kawaii-btn">Guardar Receta</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Modal para Asignar Receta al Menú -->
+    <div class="modal-overlay" id="assignRecipeModal" style="display: none;">
+      <div class="modal-content">
+        <button class="modal-close" id="closeAssignModal">&times;</button>
+        <h2 class="modal-title">Añadir al Menú</h2>
+        
+        <div id="assignModalContent">
+          <!-- Se rellena con JavaScript -->
+        </div>
+        
+        <div class="modal-actions">
+          <button id="removeFromMenuBtn" class="btn-danger" style="display: none;">Quitar del menú</button>
+          <button id="cancelAssignBtn" class="btn-secondary">Cancelar</button>
+          <button id="confirmAssignBtn" class="kawaii-btn">Añadir al Menú</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Modal para Ver Detalles de Receta -->
+    <div class="modal-overlay" id="viewRecipeModal" style="display: none;">
+      <div class="modal-content">
+        <button class="modal-close" id="closeViewRecipeModal">&times;</button>
+        <h2 class="modal-title" id="viewRecipeTitle">Detalles de la Receta</h2>
+        
+        <div id="recipeDetails">
+          <!-- Se rellena con JavaScript -->
+        </div>
+        
+        <div class="modal-actions">
+          <button id="editRecipeBtn" class="kawaii-btn">Editar Receta</button>
+          <button id="addToMenuBtn" class="kawaii-btn">Añadir al Menú</button>
+          <button id="closeViewRecipeBtn" class="btn-secondary">Cerrar</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Modal para Generar Lista de Compra -->
+    <div class="modal-overlay" id="generateShoppingModal" style="display: none;">
+      <div class="modal-content">
+        <button class="modal-close" id="closeShoppingModal">&times;</button>
+        <h2 class="modal-title">Generar Lista de Compra</h2>
+        
+        <div class="shopping-preview">
+          <h3>Ingredientes para esta semana</h3>
+          <div id="ingredientsPreview">
+            <!-- Se rellena con JavaScript -->
+          </div>
+        </div>
+        
+        <div class="modal-actions">
+          <button id="cancelShoppingBtn" class="btn-secondary">Cancelar</button>
+          <button id="confirmShoppingBtn" class="kawaii-btn">Añadir a la Lista de Compra</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>Hogachii &copy; 2025</p>
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+  
+  <script src="js/firebase-config.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/menu-planner.js"></script>
+</body>
+</html>
