@@ -1,0 +1,460 @@
+/* Estilos para el planificador de menú semanal - Optimizado para móvil y escritorio */
+:root {
+/* Colores actualizados para coincidir con la aplicación */
+--primary: #FFAEA3;
+--primary-light: #FFD6CF;
+--secondary: #9DDCC9;
+--background: #FFFCF5;
+--text: #4C3228;
+--text-light: #777777;
+--border: #f0f0f0;
+--white: #FFFFFF;
+}
+/* Estilos generales */
+.weekly-planner {
+background-color: var(--white);
+border-radius: 20px;
+box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+overflow: hidden;
+margin-bottom: 30px;
+}
+/* Barra de herramientas superior - Formato móvil primero */
+.menu-toolbar {
+display: flex;
+flex-direction: column;
+gap: 12px;
+margin-bottom: 20px;
+padding: 15px;
+background-color: var(--white);
+border-radius: 20px;
+box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+.menu-week-selector {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 10px;
+width: 100%;
+}
+.menu-week-selector h2 {
+margin: 0;
+white-space: nowrap;
+color: var(--primary);
+font-size: 18px;
+font-weight: 600;
+text-align: center;
+}
+.menu-actions {
+display: flex;
+flex-direction: column;
+gap: 10px;
+width: 100%;
+}
+/* Botones de flechas pequeños */
+.arrow-btn {
+background-color: var(--white);
+color: var(--primary);
+border: 2px solid var(--primary-light);
+border-radius: 50%;
+width: 36px;
+height: 36px;
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+transition: all 0.3s;
+font-size: 16px;
+padding: 0;
+}
+.arrow-btn:hover {
+background-color: var(--primary-light);
+color: var(--text);
+}
+/* Planificador semanal */
+.planner-grid {
+overflow-x: auto;
+-webkit-overflow-scrolling: touch; /* Mejor scroll en iOS */
+padding-bottom: 10px;
+}
+.day-headers {
+display: grid;
+grid-template-columns: 90px repeat(7, minmax(90px, 1fr));
+background-color: var(--primary-light);
+position: sticky;
+top: 0;
+z-index: 10;
+}
+.day-header {
+padding: 12px 8px;
+text-align: center;
+font-weight: 600;
+color: var(--text);
+font-size: 14px;
+border-right: 1px solid var(--white);
+}
+.day-header.weekend {
+background-color: rgba(255, 174, 163, 0.2);
+}
+.time-header {
+padding: 12px 8px;
+text-align: right;
+font-weight: 600;
+color: var(--text);
+font-size: 14px;
+}
+.menu-grid {
+display: grid;
+grid-template-columns: 90px repeat(7, minmax(90px, 1fr));
+grid-template-rows: repeat(3, minmax(80px, auto));
+position: relative;
+}
+.meal-time-label {
+padding: 10px 8px;
+display: flex;
+align-items: center;
+justify-content: flex-end;
+font-weight: 600;
+color: var(--text);
+border-top: 1px solid var(--border);
+font-size: 14px;
+}
+.menu-cell {
+padding: 8px;
+border-right: 1px solid var(--border);
+border-top: 1px solid var(--border);
+min-height: 80px;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+transition: background-color 0.3s;
+}
+.menu-cell:hover {
+background-color: var(--primary-light);
+opacity: 0.8;
+}
+.menu-cell.weekend {
+background-color: rgba(255, 255, 255, 0.8);
+}
+.menu-cell.weekend:hover {
+background-color: var(--primary-light);
+opacity: 0.8;
+}
+.menu-cell-empty {
+color: #ccc;
+font-size: 24px;
+display: flex;
+align-items: center;
+justify-content: center;
+width: 100%;
+height: 100%;
+}
+.menu-cell-content {
+text-align: center;
+width: 100%;
+height: 100%;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+padding: 5px;
+border-radius: 10px;
+background-color: var(--primary-light);
+transition: transform 0.3s;
+}
+.menu-cell-content:hover {
+transform: scale(1.05);
+}
+.menu-recipe-name {
+font-weight: 600;
+margin-bottom: 3px;
+font-size: 13px;
+color: var(--text);
+display: -webkit-box;
+-webkit-line-clamp: 2;
+-webkit-box-orient: vertical;
+overflow: hidden;
+}
+.menu-recipe-desc {
+font-size: 11px;
+color: var(--text-light);
+display: -webkit-box;
+-webkit-line-clamp: 2;
+-webkit-box-orient: vertical;
+overflow: hidden;
+}
+.menu-recipe-icon {
+font-size: 20px;
+margin-bottom: 3px;
+}
+/* Sección de Mis Recetas */
+.recipes-section {
+margin-top: 30px;
+background-color: var(--white);
+border-radius: 20px;
+box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+padding: 20px;
+}
+.recipes-section h2 {
+color: var(--primary);
+margin-top: 0;
+margin-bottom: 15px;
+font-size: 20px;
+font-weight: 600;
+}
+.search-container {
+position: relative;
+margin-bottom: 15px;
+}
+.search-container input {
+width: 100%;
+padding: 12px 15px;
+border-radius: 25px;
+border: 1px solid var(--border);
+background-color: #f9f9f9;
+font-size: 14px;
+transition: all 0.3s;
+}
+.search-container input:focus {
+outline: none;
+border-color: var(--primary);
+box-shadow: 0 0 0 3px var(--primary-light);
+}
+/* Filtros en formato pastillas */
+.recipe-categories {
+display: flex;
+overflow-x: auto;
+padding: 5px 0 15px 0;
+gap: 10px;
+scrollbar-width: none; /* Firefox */
+-ms-overflow-style: none; /* IE and Edge */
+}
+.recipe-categories::-webkit-scrollbar {
+display: none; /* Chrome, Safari, Opera */
+}
+/* Contenedor principal de recetas */
+.recipes-list {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+gap: 15px;
+margin-top: 15px;
+max-height: 500px;
+overflow-y: auto;
+padding-right: 10px;
+padding-bottom: 15px;
+}
+/* Estilos para barra de scroll personalizada */
+.recipes-list::-webkit-scrollbar {
+width: 6px;
+}
+.recipes-list::-webkit-scrollbar-track {
+background: #f5f5f5;
+border-radius: 10px;
+}
+.recipes-list::-webkit-scrollbar-thumb {
+background-color: var(--primary-light);
+border-radius: 10px;
+}
+.recipes-list::-webkit-scrollbar-thumb:hover {
+background-color: var(--primary);
+}
+/* Recetas en la lista */
+.recipe-item {
+background-color: var(--white);
+border-radius: 15px;
+padding: 15px;
+cursor: pointer;
+transition: all 0.3s;
+border: 1px solid var(--border);
+box-shadow: 0 3px 10px rgba(0,0,0,0.03);
+display: flex;
+flex-direction: column;
+height: 100%;
+}
+.recipe-item:hover {
+transform: translateY(-5px);
+box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+border-color: var(--primary-light);
+}
+.recipe-item h4 {
+margin: 0 0 8px 0;
+color: var(--text);
+font-size: 16px;
+font-weight: 600;
+}
+.recipe-meta {
+font-size: 12px;
+color: var(--text-light);
+margin-bottom: 8px;
+}
+.recipe-tags {
+display: flex;
+flex-wrap: wrap;
+gap: 5px;
+margin-top: auto;
+}
+.recipe-tag {
+background-color: var(--primary-light);
+color: var(--text);
+font-size: 11px;
+padding: 3px 8px;
+border-radius: 10px;
+}
+/* Paginación */
+.pagination-controls {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 15px;
+margin-top: 20px;
+}
+#paginationInfo {
+font-size: 14px;
+color: var(--text-light);
+}
+/* Loader */
+.loader {
+width: 40px;
+height: 40px;
+border: 3px solid var(--primary-light);
+border-top: 3px solid var(--primary);
+border-radius: 50%;
+animation: spin 1s linear infinite;
+margin: 30px auto;
+}
+@keyframes spin {
+0% { transform: rotate(0deg); }
+100% { transform: rotate(360deg); }
+}
+/* Modal para asignar receta al menú */
+.recipe-selection {
+margin-top: 15px;
+margin-bottom: 15px;
+}
+.selected-recipe {
+background-color: #f9f9f9;
+border-radius: 15px;
+padding: 15px;
+display: flex;
+align-items: center;
+gap: 15px;
+margin-top: 10px;
+}
+.recipe-icon {
+font-size: 24px;
+}
+.recipe-info {
+flex-grow: 1;
+}
+.recipe-name {
+font-weight: 600;
+margin-bottom: 5px;
+color: var(--text);
+}
+.recipe-description {
+font-size: 13px;
+color: var(--text-light);
+}
+/* Lista rápida de recetas en modal */
+.recipes-quick-list {
+margin-top: 15px;
+}
+.recipes-quick-list .recipe-item {
+margin-bottom: 10px;
+padding: 10px;
+border-left: 4px solid transparent;
+}
+.recipes-quick-list .recipe-item.selected {
+background-color: var(--primary-light);
+border-left-color: var(--primary);
+}
+/* Responsive */
+@media (min-width: 768px) {
+.menu-toolbar {
+flex-direction: row;
+justify-content: space-between;
+align-items: center;
+}
+.menu-week-selector {
+width: auto;
+}
+.menu-actions {
+flex-direction: row;
+width: auto;
+}
+/* Mayores espacios en desktop */
+.menu-cell {
+min-height: 100px;
+}
+.menu-recipe-name {
+font-size: 14px;
+}
+.menu-recipe-desc {
+font-size: 12px;
+}
+.menu-recipe-icon {
+font-size: 22px;
+}
+}
+@media (max-width: 768px) {
+.recipes-list {
+grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+max-height: 400px;
+}
+.day-headers {
+grid-template-columns: 70px repeat(7, minmax(70px, 1fr));
+}
+.menu-grid {
+grid-template-columns: 70px repeat(7, minmax(70px, 1fr));
+}
+.day-header, .time-header {
+font-size: 12px;
+padding: 10px 5px;
+}
+.meal-time-label {
+font-size: 12px;
+}
+.menu-recipe-name {
+font-size: 12px;
+}
+}
+@media (max-width: 576px) {
+/* Ajustes adicionales para móviles pequeños */
+.planner-grid {
+min-width: 100%;
+overflow-x: auto;
+}
+.day-headers {
+min-width: 650px;
+grid-template-columns: 60px repeat(7, 1fr);
+}
+.menu-grid {
+min-width: 650px;
+grid-template-columns: 60px repeat(7, 1fr);
+}
+.menu-cell {
+min-height: 70px;
+}
+.day-header, .time-header {
+font-size: 11px;
+padding: 8px 5px;
+}
+.meal-time-label {
+font-size: 11px;
+}
+.menu-recipe-icon {
+font-size: 16px;
+}
+.menu-recipe-name {
+font-size: 11px;
+-webkit-line-clamp: 1;
+}
+.menu-recipe-desc {
+font-size: 9px;
+-webkit-line-clamp: 1;
+}
+.recipes-list {
+grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+}
+}
